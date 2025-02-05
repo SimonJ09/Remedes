@@ -1,0 +1,194 @@
+{% extends "layouts/base-admin.html" %}
+
+{% block title %} Tables {% endblock %} 
+
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <main>
+        <div class="container-fluid px-4">
+            <h1 class="mt-4">Tables</h1>
+            <ol class="breadcrumb mb-4">
+                <li class="breadcrumb-item"><a href="admin/">Dashboard</a></li>
+                <li class="breadcrumb-item active">Tables Rémèdes</li>
+            </ol>
+            <div class="card mb-4">
+                <div class="card-body">
+                </div>
+            </div>
+            <div class="card mb-4">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <div class="card-header">
+                        <li>
+                            <i class="fas fa-table me-1"></i>
+                             DataTable
+                        </li>
+                        <li> 
+                            <a href="/ajout_remede">Ajouter </a>
+                        </li>
+                        <li>
+                            <a href="">Enrégistrer</a>
+                        </li>
+                </div>
+                <div class="table-responsive" class="card-body">
+
+                    <div class="mb-3">
+                        <label for="bulkActions" class="form-label">Actions en masse</label>
+                        <select id="bulkActions" class="form-select">
+                            <option value="">Choisir une action...</option>
+                            <option value="delete">Supprimer sélectionnés</option>
+                            <option value="activate">Activer sélectionnés</option>
+                            <option value="deactivate">Désactiver sélectionnés</option>
+                        </select>
+                        <button id="applyAction" class="btn btn-primary mt-2" disabled>Appliquer l'action</button>
+                    </div>
+                    
+                    <table class="table" id="datatablesSimple">
+                        <thead>
+                            <tr>
+                                <tr> 
+                                    <th>
+                                    </th>
+                                    <th>Titre </th>
+                                    <th>Description</th>
+                                    <th>Préparation</th>
+                                    <th>Indications</th>
+                                    <th>Dosage</th>
+                                    <th>Precautions</th>
+                                    <th>Position</th>
+                                    <th>utilisateur</th>
+                                    <th>Image</th>
+                                    <th>Video</th>
+                                    <th>Start date</th>
+                                    <th>Update date</th>
+                                    <th>Ingrédients-quantité </th>
+                                    <th>Maux </th>
+                                    <th>Articles </th>
+                                    <th>Action</th>
+                                </tr>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>
+                                    <input type="checkbox" id="selectAll" class="form-check-input">
+                                </th>
+                                <th>Titre</th>
+                                <th>Description</th>
+                                <th>Préparation</th>
+                                <th>Indications</th>
+                                <th>Dosage</th>
+                                <th>Précautions</th>
+                                <th>Position</th>
+                                <th>utilisateur</th>
+                                <th>Image</th>
+                                <th>Video</th>
+                                <th>Start date</th>
+                                <th>Update date</th>
+                                <th>Ingrédients</th>
+                                <th>Maux </th>
+                                <th>Articles </th>
+                                <th>Action</th>
+                            </tr>
+                        </tfoot>
+                        <tbody>
+                            {% for remede in remedes %}
+                            <tr>
+                                <td>
+                                    <div class="form-check">
+                                        <input class="form-check-input selectItem" type="checkbox" value="{{ remede.id }}" id="checkbox{{ remede.id }}">
+                                    </div>                                    
+                                </td>
+                                <td>{{remede.nom}}</td>
+                                <td>{{remede.description }}</td>
+                                <td>{{remede.preparation}}</td>
+                                <td>{{remede.indications}}</td>
+                                <td>{{remede.dosage}}</td>
+                                <td>{{remede.precautions}}</td>
+                                <td>{{remede.longitude}} - {{remede.latitude}}</td>
+                                <td>{{remede.user.username}}</td>
+                                <td>{{remede.images}}</td>
+                                <td>{{remede.video}}</td>
+                                <td>{{remede.date_ajout}}</td>
+                                <td>{{remede.date_mise_a_jour}}</td>
+                                <td>
+                                    {% if remede.ingredients %}
+                                        <ul class="list-unstyled mb-0">
+                                            {% for remedeIngredient in remede.ingredients %}
+                                                <li>
+                                                    {{ remedeIngredient.ingredient.nom_commun }} : {{ remedeIngredient.quantite }}
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% else %}
+                                        <span>Aucun ingrédient</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if remede.maladie %}
+                                        <ul class="list-unstyled mb-0">
+                                            {% for remedeMaladie in remede.maladie %}
+                                                <li>
+                                                    {{ remedeMaladie.nom_commun }}
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% else %}
+                                        <span>Aucun Maladie</span>
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    {% if remede.article %}
+                                        <ul class="list-unstyled mb-0">
+                                            {% for remedeArticle in remede.article %}
+                                                <li>
+                                                    {{ remedeArticles.article.titre}}
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% else %}
+                                        <span>Aucun Article</span>
+                                    {% endif %}
+                                </td>
+                                
+                                <td class="d-flex">
+                                    <!-- Lien vers la page d'édition -->
+                                    <a href="{{ url_for('admin_blueprint.editer_remede', id=remede.id) }}" class="btn btn-warning btn-sm mr-2">
+                                        <i class="fas fa-edit"></i> 
+                                    </a>
+                                
+                                    <!-- Lien vers la page de suppression -->
+                                    <a href="{{ url_for('admin_blueprint.delete_remede', id=remede.id) }}" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet ingrédient ?');">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+{% include 'includes/scripts-admin-remede.html' %}
+{% include 'includes/script-ajout-remede.html' %}
+    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" crossorigin="anonymous"></script>
+    <script src="/static/assetsadmin/js/datatables-simple-demo.js"></script>
+
+{% endblock javascripts %}

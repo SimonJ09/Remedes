@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+    <meta name="description" content="Sb Admin dashboard migrated to Python by AppSeed" />
+    <meta name="author" content="startbootstrap & AppSeed" />
+    
+    <title>
+        IIVGN - {% block title %}{% endblock %} | XageLAB
+    </title>
+
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" />
+    <link href="/static/assetsadmin/css/styles.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js" crossorigin="anonymous"></script>
+
+    <link type="text/css" href="/static/assets/vendor/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+    
+    <!-- Specific Page CSS goes HERE  -->
+    {% block stylesheets %}{% endblock stylesheets %}
+
+</head>
+<body class="sb-nav-fixed">
+        
+    {% include 'includes/navigation-admin.html' %}
+
+    <div id="layoutSidenav">
+        <div id="layoutSidenav_nav">
+
+            {% include 'includes/sidebar-admin.html' %}
+            
+        </div>
+        <div id="layoutSidenav_content">
+        
+            {% block content %}{% endblock content %}
+
+            {% include 'includes/footer-admin.html' %}
+            
+        </div>
+    </div>
+
+    {% include 'includes/scripts-admin.html' %} 
+    {% include 'includes/scripts.html' %}
+
+    <!-- Specific Page JS goes HERE  -->
+    {% block javascripts %}{% endblock javascripts %}
+        
+</body>
+</html>

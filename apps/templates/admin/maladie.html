@@ -1,0 +1,130 @@
+{% extends "layouts/base-admin.html" %}
+
+{% block title %} Tables {% endblock %} 
+
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <main>
+        <div class="container-fluid px-4">
+            <h1 class="mt-4">Tables</h1>
+            <ol class="breadcrumb mb-4">
+                <li class="breadcrumb-item"><a href="admin/">Dashboard</a></li>
+                <li class="breadcrumb-item active">Tables des Maux </li>
+            </ol>
+            <div class="card mb-4">
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+                </div>
+            </div>
+            <div class="card mb-4">
+                <div class="card-header">
+                        <li>
+                            <i class="fas fa-table me-1"></i>
+                             DataTable 
+                        </li>
+                        <li> 
+                            <a href="/add_maladie">Ajouter </a>
+                        </li>
+                        <li>
+                            <a href="">Enrégistrer</a>
+                        </li>
+                </div>
+                <div class="table-responsive" class="card-body">
+
+                    <div class="mb-3">
+                        <label for="bulkActions" class="form-label">Actions en masse</label>
+                        <select id="bulkActions" class="form-select">
+                            <option value="">Choisir une action...</option>
+                            <option value="delete">Supprimer les maux sélectionnés</option>
+                            <option value="activate">exporter sélectionnés</option>
+                        </select>
+                        <button id="applyAction" class="btn btn-primary mt-2" disabled>Appliquer l'action</button>
+                    </div>
+                    
+                    <table class="table" id="datatablesSimple">
+                        <thead>
+                            <tr>
+                                <tr>
+                                    <th>
+                                        
+                                    </th>
+                                    <th>Nom Commun</th>
+                                    <th>Nom Fon</th>
+                                    <th>Propriétés</th>
+                                    <th>Image</th>
+                                    <th>Start date</th>
+                                    <th>Update date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </tr>
+                        </thead>
+                      
+                        <tfoot>
+                            <tr>
+                                <th>
+                                    <input type="checkbox" id="selectAll" class="form-check-input">
+                                </th>
+                                <th>Nom Commun</th>
+                                <th>Nom Fon</th>
+                                <th>Propriétés</th>
+                                <th>Image</th>
+                                <th>Start date</th>
+                                <th>Update date</th>
+                                <th>Action</th>
+                            </tr>
+                        </tfoot>
+                        <tbody>
+                            {% for mal in maux %}
+                            <tr>
+                                <td>
+                                    <div class="form-check">
+                                        <input class="form-check-input selectItem" type="checkbox" value="{{ mal.id }}" id="checkbox{{ mal.id }}">
+                                    </div>                                    
+                                </td>
+                                <td>{{mal.nom_commun}}</td>
+                                <td>{{mal.nom_fon}}</td>
+                                <td>{{mal.proprietes}}</td>
+                                <td>{{mal.images}}</td>
+                                <td>{{mal.date_ajout}}</td>
+                                <td>{{mal.date_mise_a_jour}}</td>
+                                <td class="d-flex">
+                                    <!-- Lien vers la page d'édition -->
+                                    <a href="{{ url_for('admin_blueprint.edit_maladie', id=mal.id) }}" class="btn btn-warning btn-sm mr-2">
+                                        <i class="fas fa-edit"></i> 
+                                    </a>
+                                
+                                    <!-- Lien vers la page de suppression -->
+                                    <a href="{{ url_for('admin_blueprint.delete_maladie', id=mal.id) }}" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce mal ?');">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+{% include 'includes/scripts-admin-mal.html' %}
+
+    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" crossorigin="anonymous"></script>
+    <script src="/static/assetsadmin/js/datatables-simple-demo.js"></script>
+
+{% endblock javascripts %}

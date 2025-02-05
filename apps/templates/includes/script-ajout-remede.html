@@ -1,0 +1,74 @@
+<script>
+
+    
+    // Script pour sauvegarder les ingrédients
+    document.getElementById("saveIngredients").addEventListener("click", function () {
+        const selectedIngredients = [];
+        document.querySelectorAll(".form-check-input:checked").forEach((checkbox) => {
+            const ingredientId = checkbox.value;
+            const quantityInput = document.getElementById(`quantity${ingredientId}`);
+            const quantity = quantityInput ? quantityInput.value : "";
+            selectedIngredients.push({ id: ingredientId, quantity });
+        });
+
+        console.log("Ingrédients sélectionnés :", selectedIngredients);
+
+        const ingredientsInput = document.createElement("input");
+        ingredientsInput.type = "hidden";
+        ingredientsInput.name = "ingredients";
+        ingredientsInput.value = JSON.stringify(selectedIngredients);
+        const form = document.querySelector("form");
+        form.appendChild(ingredientsInput);
+
+        console.log("Formulaire mis à jour :", form);
+    });
+
+    // Script pour sauvegarder les maux
+    document.getElementById("saveMaux").addEventListener("click", function () {
+        const selectedMaux = [];
+        document.querySelectorAll(".form-check-input:checked").forEach((checkbox) => {
+            const malId = checkbox.value;
+            selectedMaux.push({ id: malId });
+        });
+
+        console.log("Maux sélectionnés :", selectedMaux);
+
+        const mauxInput = document.createElement("input"); 
+        mauxInput.type = "hidden";
+        mauxInput.name = "maux";
+        mauxInput.value = JSON.stringify(selectedMaux);
+        const form = document.querySelector("form");
+        form.appendChild(mauxInput);
+
+        console.log("Formulaire mis à jour :", form);
+
+        
+    });
+
+    // Script pour sauvegarder les articles
+    document.getElementById("saveArticles").addEventListener("click", function () {
+        const selectedArticles = [];
+        document.querySelectorAll(".form-check-input:checked").forEach((checkbox) => {
+            const articleId = checkbox.value;
+            selectedArticles.push({ id: articleId });
+        });
+
+        console.log("Articles sélectionnés :", selectedArticles);
+
+        const articlesInput = document.createElement("input");
+        articlesInput.type = "hidden";
+        articlesInput.name = "articles";
+        articlesInput.value = JSON.stringify(selectedArticles);
+        const form = document.querySelector("form");
+        form.appendChild(articlesInput);
+
+        console.log("Formulaire mis à jour :", form);
+
+        // Fermer la modale
+        
+    });
+</script>
+
+
+
+

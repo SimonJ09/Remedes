@@ -1,0 +1,72 @@
+<script>
+    // Activer/désactiver le bouton "Appliquer l'action" en fonction de la sélection des cases
+    document.querySelectorAll('.selectItem').forEach(item => {
+        item.addEventListener('change', toggleApplyActionButton);
+    });
+
+    // Activer ou désactiver le bouton "Appliquer l'action" en fonction des éléments sélectionnés
+    function toggleApplyActionButton() {
+        const selectedItems = document.querySelectorAll('.selectItem:checked');
+        const applyButton = document.getElementById('applyAction');
+        applyButton.disabled = selectedItems.length === 0;
+    }
+
+    // Cocher/décocher toutes les cases à cocher avec la case "Sélectionner tout"
+    document.getElementById('selectAll').addEventListener('change', function() {
+        const isChecked = this.checked;
+        document.querySelectorAll('.selectItem').forEach(item => {
+            item.checked = isChecked;
+        });
+        toggleApplyActionButton();
+    });
+
+    // Appliquer l'action sélectionnée sur les éléments cochés
+    document.getElementById('applyAction').addEventListener('click', function() {
+        const selectedItems = document.querySelectorAll('.selectItem:checked');
+        const action = document.getElementById('bulkActions').value;
+
+        if (selectedItems.length > 0 && action) {
+    const ids = Array.from(selectedItems).map(item => item.value);
+
+    const url = (() => {
+        switch (action) {
+            case 'delete':
+                return confirm('Êtes-vous sûr de vouloir supprimer ces maux sélectionnés ?')
+                    ? '{{ url_for("admin_blueprint.delete_selected_maux") }}'
+                    : null;
+            case 'activate':
+                return '{{ url_for("admin_blueprint.maladie") }}';
+            default:
+                alert("Action inconnue !");
+                return null;
+        }
+    })();
+
+    if (url) {
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ ids })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload(); // Recharge la page pour mettre à jour l'interface
+            } else {
+                alert("Une erreur s'est produite : " + data.message);
+            }
+        })
+        .catch(error => {
+            console.error("Erreur :", error);
+            alert("Une erreur inattendue s'est produite.");
+        });
+    }
+} else {
+    alert("Veuillez sélectionner des éléments et une action.");
+}
+
+    });
+</script>

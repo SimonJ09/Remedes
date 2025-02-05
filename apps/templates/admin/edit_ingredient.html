@@ -1,0 +1,77 @@
+{% extends "layouts/base_form.html" %}
+
+{% block title %} Ajout ou édition d'un ingrédient {% endblock %}
+
+<!-- Specific Page CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+<main>
+    {% include 'includes/preloader.html' %}
+    <!-- Section -->
+    <section class="section section-lg pt-6">
+        <div class="container">
+            <div class="row justify-content-center mb-5 mb-lg-6">
+                <div class="col-12 col-lg-8">
+                    <!-- Form Card -->
+                    <div class="card border-0 p-2 p-md-3 p-lg-5">
+                        <div class="card-header bg-white border-0 text-center">
+                            <h2>Ajouter ou éditer un ingrédient</h2>
+                            <p>Complétez le formulaire pour enregistrer un ingrédient</p>
+                            <br />
+                            <span class="font-weight-normal">
+                                {% if msg %}
+                                    <span class="{{ 'text-success' if success else 'text-danger' }}">
+                                        {{ msg | safe }}
+                                    </span>
+                                {% else %}
+                                    Remplissez les informations demandées ci-dessous
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="card-body px-0 pt-0">
+                            <form method="POST" enctype="multipart/form-data">
+                                {{ form.hidden_tag() }}
+                                
+                                <div class="form-group">
+                                    <label for="nom_commun">Nom Commun</label>
+                                    {{ form.nom_commun(class="form-control", value=form.nom_commun.data) }}
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="nom_scientifique">Nom Scientifique</label>
+                                    {{ form.nom_scientifique(class="form-control", value=form.nom_scientifique.data) }}
+                                </div>
+                            
+                                <div class="form-group">
+                                    <label for="partie">Partie</label>
+                                    {{ form.partie(class="form-control", value=form.partie.data) }}
+                                </div>
+                            
+                                <div class="form-group">
+                                    <label for="images">Image</label>
+                                    {{ form.images(class="form-control") }}
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary">Modifier</button>
+                            </form>
+                            
+                        </div>
+                    </div>
+                    <!-- End of Form Card -->
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- End of Section -->
+</main>
+
+{% include 'includes/footer-admin.html' %}
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE -->
+{% block javascripts %}
+{% include 'includes/scripts-admin.html' %}
+{% endblock javascripts %}

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<!-- Primary Meta Tags -->
+<title>
+    IIVGN - Presentation | Xage LAB
+</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="title" content="Pixel - Free Bootstrap 5 UI Kit">
+<meta name="author" content="Themesberg">
+<meta name="description" content="Open source and free Bootstrap 5 UI Kit featuring 80 UI components, 5 example pages, and a Gulp and Sass workflow.">
+<link rel="canonical" href="https://appseed.us/apps/flask-apps/flask-pixel-bootstrap-uikit">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://demo.themesberg.com/pixel-bootstrap-5-ui-kit">
+<meta property="og:title" content="Pixel - Free Bootstrap 5 UI Kit">
+<meta property="og:description" content="Open source and free Bootstrap 5 UI Kit featuring 80 UI components, 5 example pages, and a Gulp and Sass workflow.">
+<meta property="og:image" content="https://themesberg.s3.us-east-2.amazonaws.com/public/products/pixel-lite/pixel-lite-preview.jpg">
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:url" content="https://demo.themesberg.com/pixel-bootstrap-5-ui-kit">
+<meta property="twitter:title" content="Pixel - Free Bootstrap 5 UI Kit">
+<meta property="twitter:description" content="Open source and free Bootstrap 5 UI Kit featuring 80 UI components, 5 example pages, and a Gulp and Sass workflow.">
+<meta property="twitter:image" content="https://themesberg.s3.us-east-2.amazonaws.com/public/products/pixel-lite/pixel-lite-preview.jpg">
+
+<!-- Favicon -->
+<link rel="apple-touch-icon" sizes="120x120" href="/static/assets/img/favicon/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/static/assets/img/favicon/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/static/assets/img/favicon/favicon-16x16.png">
+<link rel="manifest" href="/static/assets/img/favicon/site.webmanifest">
+<link rel="mask-icon" href="/static/assets/img/favicon/safari-pinned-tab.svg" color="#ffffff">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="theme-color" content="#ffffff">
+
+<!-- Fontawesome -->
+<link type="text/css" href="/static/assets/vendor/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+
+<!-- Pixel CSS -->
+<link type="text/css" href="/static/assets/css/pixel.css" rel="stylesheet">
+
+</head>
+<body>
+    
+  {% include 'includes/navigation.html' %}
+    {% include 'includes/style_menu.html' %}
+    
+
+    <main>
+
+        {% include 'includes/preloader.html' %}
+
+        <!-- Hero -->
+        <section class="section-header overflow-hidden pt-7 pt-lg-6 pb-6 pb-lg-3 bg-primary text-white">
+            <div class="container">
+                
+            </div>
+            <figure class="position-absolute bottom-0 left-0 w-100 d-none d-md-block mb-n2"></figure>
+        </section>
+        <div class="section py-0">
+            <div class="container mt-n10 mt-lg-n12 z-2">
+                <div class="row justify-content-center">
+                    <div class="col-12 col-md-10"></div>
+                </div>
+            </div>
+        </div>
+        <section class="section section-lg">
+            <div class="container">
+                <div class="row justify-content-center mb-3 mb-lg-3">
+                </div>
+            </div>
+        </section>
+        <!--End of Title section-->
+        <div class="section section-md">
+          <div class="container">
+            <!-- Barre de recherche -->
+            <form  method="post" action="{{ url_for('remedes_blueprint.remedes') }}">
+              <div class="search-bar">
+                <input type="text" id="searchInput" name="mot_cle" placeholder="Recherchez un remède ou un ingrédient..." value="{{ mot_cle }}" style="text-align: center; font-size: 1.5em;" />
+                <button>Rechercher</button>
+              </div>
+             </form>
+            <!-- Liste des remèdes -->
+            <div class="remedes-list">
+              <!-- Boucle sur les résultats -->
+              {% for remede in resultats %}
+              <div class="remede-card">
+                  <!-- Gestion des images -->
+                  <img src="{{ url_for('static', filename='uploads/' + remede.images.replace('\\', '/')) if remede.images else url_for('static', filename='assets/img/blog/image-1.jpg') }}" alt="Image de remède" />
+                  <div class="commentaire-text">
+                      <div class="remede-content">
+                          <h3>{{ remede.nom}}</h3>
+                          <p>
+                              Description : {{ remede.description or 'Non spécifiée' }}<br />
+                              Indications : {{ remede.indications or 'Non spécifiées' }}<br />
+                              Dosage : {{ remede.dosage or 'Non spécifié' }}
+                          </p>
+                      </div>
+          
+                      <!-- Ingrédients -->
+                      {% if remede.ingredients %}
+                      <div class="ingredients-section">
+                          <h4>Ingrédients :</h4>
+                          <ul>
+                              {% for ingredient in remede.ingredients %}
+                              <li>{{ ingredient.nom_commun }} - {{ ingredient.quantite }}</li>
+                              {% endfor %}
+                          </ul>
+                      </div>
+                      {% endif %}
+          
+                      <!-- Maladies associées -->
+                      {% if remede.maladies %}
+                      <div class="maladies-section">
+                          <h4>Maladies associées :</h4>
+                          <ul>
+                              {% for maladie in remede.maladies %}
+                              <li>{{ maladie.nom_commun }}</li>
+                              {% endfor %}
+                          </ul>
+                      </div>
+                      {% endif %}
+          
+                      <!-- Articles scientifiques associés -->
+                      {% if remede.articles %}
+                      <div class="articles-section">
+                          <h4>Articles scientifiques associés :</h4>
+                          <ul>
+                              {% for article in remede.articles %}
+                              <li><a href="{{ article.lien }}" target="_blank">{{ article.titre }}</a></li>
+                              {% endfor %}
+                          </ul>
+                      </div>
+                      {% endif %}
+
+                      {% if remede.liens %}
+                      <a href="{{ remede.liens }}" target="_blank" rel="noopener noreferrer">En savoir plus</a>
+                      {% endif %}
+          
+                      <!-- Boutons "J'aime" et "Commentaire" -->
+                      <div class="interaction-bar">
+                          <button class="like-btn">❤️ J'aime</button>
+                          <button class="comment-btn" onclick="toggleComments('comments-{{ loop.index }}')">💬 Commenter</button>
+                      </div>
+          
+                      <!-- Section des commentaires -->
+                      
+                      <div class="comments-section" id="comments-{{ loop.index }}" style="display:none;">
+                        {% if remede.commentaires %}
+                          {% for commentaire in remede.commentaires %}
+                          <div class="comment">
+                              <p><strong>{{ commentaire.user.username }} :</strong> {{ commentaire.comment }}</p>
+                          </div>
+                          {% endfor %}
+                          {% endif %}
+                          <form action="#" method="POST">
+                              <textarea name="comment" placeholder="Ajouter un commentaire..."></textarea>
+                              <button type="submit">Soumettre</button>
+                          </form>
+                      </div>
+                     
+                  </div>
+              </div>
+              {% endfor %}
+          </div>
+          
+          
+              <div class="col-md-6">
+                <br>
+                <div class="mb-4">
+                    <h4 class="h6 font-weight-bold"></h4>
+                </div>
+                <nav aria-label="Blog page navigation">
+                  <ul class="pagination">
+                    {% if page > 1 %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('remedes_blueprint.remedes', page=1) }}" aria-label="First">
+                            <span class="fas fa-angle-double-left"></span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('remedes_blueprint.remedes', page=page-1) }}">Précédent</a>
+                    </li>
+                    {% endif %}
+                
+                    {% for i in range(1, total_pages + 1) %}
+                    <li class="page-item {% if i == page %}active{% endif %}">
+                        <a class="page-link" href="{{ url_for('remedes_blueprint.remedes', page=i) }}">{{ i }}</a>
+                    </li>
+                    {% endfor %}
+                
+                    {% if page < total_pages %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('remedes_blueprint.remedes', page=page+1) }}">Suivant</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('remedes_blueprint.remedes', page=total_pages) }}" aria-label="Last">
+                            <span class="fas fa-angle-double-right"></span>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>                
+                </nav>
+              </div>
+          </div>
+        </div>
+        
+
+        
+    {% include 'includes/footer.html' %}
+
+    {% include 'includes/scripts.html' %}
+
+    {% include 'includes/scripts-menu.html' %}
+</body>
+</html>

@@ -1,0 +1,134 @@
+{% extends "layouts/base_form.html" %}
+
+{% block title %} Ajout ou édition d'un ingrédient {% endblock %}
+
+<!-- Specific Page CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+<main>
+    {% include 'includes/preloader.html' %}
+    <!-- Section -->
+    <section class="section section-lg pt-6">
+        <div class="container">
+            <div class="row justify-content-center mb-5 mb-lg-6">
+                <div class="col-12 col-lg-8">
+                    <!-- Form Card -->
+                    <div class="card border-0 p-2 p-md-3 p-lg-5">
+                        <div class="card-header bg-white border-0 text-center">
+                            <h2>Ajouter ou éditer un ingrédient</h2>
+                            <p>Complétez le formulaire pour enregistrer un ingrédient</p>
+                            <a href="/dashboard_ingredient" class="btn btn-secondary btn-sm">
+                                Retour
+                            </a>
+                            <br />
+                            <span class="font-weight-normal">
+                                {% if msg %}
+                                    <span class="{{ 'text-success' if success else 'text-danger' }}">
+                                        {{ msg | safe }}
+                                    </span>
+                                {% else %}
+                                    Remplissez les informations demandées ci-dessous
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="card-body px-0 pt-0">
+                            <form method="POST" action="" enctype="multipart/form-data">
+                                {{ form.hidden_tag() }}
+
+                                <!-- Champ Nom Commun -->
+                                <div class="mb-4">
+                                    <label for="nom_commun">{{ form.nom_commun.label }}</label>
+                                    {{ form.nom_commun(class="form-control", placeholder="Ex. : Gingembre") }}
+                                    {% if form.nom_commun.errors %}
+                                        <span class="text-danger">{{ form.nom_commun.errors[0] }}</span>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Champ Nom Fon -->
+                                <div class="mb-4">
+                                    <label for="nom_fon">{{ form.nom_fon.label }}</label>
+                                    {{ form.nom_fon(class="form-control", placeholder="Nom local en langue Fon") }}
+                                    {% if form.nom_fon.errors %}
+                                        <span class="text-danger">{{ form.nom_fon.errors[0] }}</span>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Champ Nom Scientifique -->
+                                <div class="mb-4">
+                                    <label for="nom_scientifique">{{ form.nom_scientifique.label }}</label>
+                                    {{ form.nom_scientifique(class="form-control", placeholder="Nom scientifique de l'ingrédient") }}
+                                    {% if form.nom_scientifique.errors %}
+                                        <span class="text-danger">{{ form.nom_scientifique.errors[0] }}</span>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Champ Partie utilisée -->
+                                <div class="mb-4">
+                                    <label for="partie">{{ form.partie.label }}</label>
+                                    {{ form.partie(class="form-control", placeholder="Ex. : Racine, Feuille") }}
+                                    {% if form.partie.errors %}
+                                        <span class="text-danger">{{ form.partie.errors[0] }}</span>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Champ Propriétés -->
+                                <div class="mb-4">
+                                    <label for="proprietes">{{ form.proprietes.label }}</label>
+                                    {{ form.proprietes(class="form-control", placeholder="Propriétés thérapeutiques, nutritives, etc.") }}
+                                    {% if form.proprietes.errors %}
+                                        <span class="text-danger">{{ form.proprietes.errors[0] }}</span>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Champ Latitude -->
+                                <div class="mb-4">
+                                    <label for="latitude">{{ form.latitude.label }}</label>
+                                    {{ form.latitude(class="form-control", placeholder="Coordonnée géographique : latitude") }}
+                                    {% if form.latitude.errors %}
+                                        <span class="text-danger">{{ form.latitude.errors[0] }}</span>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Champ Longitude -->
+                                <div class="mb-4">
+                                    <label for="longitude">{{ form.longitude.label }}</label>
+                                    {{ form.longitude(class="form-control", placeholder="Coordonnée géographique : longitude") }}
+                                    {% if form.longitude.errors %}
+                                        <span class="text-danger">{{ form.longitude.errors[0] }}</span>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Champ Images -->
+                                <div class="mb-3">
+                                    <label for="images">{{ form.images.label }}</label>
+                                    {{ form.images(class="form-control") }}
+                                    {% if form.images.errors %}
+                                        <span class="text-danger">{{ form.images.errors[0] }}</span>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Bouton Soumettre -->
+                                <div class="d-grid">
+                                    <button type="submit" class="btn rounded btn-secondary">Soumettre</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <!-- End of Form Card -->
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- End of Section -->
+</main>
+
+{% include 'includes/footer-admin.html' %}
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE -->
+{% block javascripts %}
+{% include 'includes/scripts-admin.html' %}
+{% endblock javascripts %}

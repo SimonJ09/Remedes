@@ -1,0 +1,108 @@
+{% extends "layouts/base_form.html" %}
+
+{% block title %} Ajout ou édition d'un ingrédient {% endblock %}
+
+<!-- Specific Page CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+<main>
+    {% include 'includes/preloader.html' %}
+    <!-- Section -->
+    <section class="section section-lg pt-6">
+        <div class="container">
+            <div class="row justify-content-center mb-5 mb-lg-6">
+                <div class="col-12 col-lg-8">
+                    <!-- Form Card -->
+                    <div class="card border-0 p-2 p-md-3 p-lg-5">
+                        <div class="card-header bg-white border-0 text-center">
+                            <h2>Ajouter ou éditer un article</h2>
+                            <p>Complétez le formulaire pour enregistrer un article</p>
+                            <a href="/article" class="btn btn-secondary btn-sm">
+                                Retour
+                            </a>
+                            <br />
+                            <span class="font-weight-normal">
+                                {% if msg %}
+                                    <span class="{{ 'text-success' if success else 'text-danger' }}">
+                                        {{ msg | safe }}
+                                    </span>
+                                {% else %}
+                                    Remplissez les informations demandées ci-dessous
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="card-body px-0 pt-0">
+                            <form method="POST" action="" enctype="multipart/form-data">
+                                {{ form.hidden_tag() }}
+                            
+                                <!-- Champ Titre -->
+                                <div class="mb-4">
+                                    <label for="titre">{{ form.titre.label }}</label>
+                                    {{ form.titre(class="form-control", placeholder="Titre de l'article") }}
+                                    {% if form.titre.errors %}
+                                        <span class="text-danger">{{ form.titre.errors[0] }}</span>
+                                    {% endif %}
+                                </div>
+                            
+                                <!-- Champ Auteur -->
+                                <div class="mb-4">
+                                    <label for="auteur">{{ form.auteur.label }}</label>
+                                    {{ form.auteur(class="form-control", placeholder="Nom de l'auteur de l'article") }}
+                                    {% if form.auteur.errors %}
+                                        <span class="text-danger">{{ form.auteur.errors[0] }}</span>
+                                    {% endif %}
+                                </div>
+                            
+                                <!-- Champ Résumé -->
+                                <div class="mb-4">
+                                    <label for="resume">{{ form.resume.label }}</label>
+                                    {{ form.resume(class="form-control", placeholder="Résumé ou description de l'article") }}
+                                    {% if form.resume.errors %}
+                                        <span class="text-danger">{{ form.resume.errors[0] }}</span>
+                                    {% endif %}
+                                </div>
+                            
+                                <!-- Champ Date de Publication -->
+                                <div class="mb-4">
+                                    <label for="date_publication">{{ form.date_publication.label }}</label>
+                                    {{ form.date_publication(class="form-control", placeholder="YYYY-MM-DD") }}
+                                    {% if form.date_publication.errors %}
+                                        <span class="text-danger">{{ form.date_publication.errors[0] }}</span>
+                                    {% endif %}
+                                </div>
+                            
+                                <!-- Champ Lien -->
+                                <div class="mb-4">
+                                    <label for="lien">{{ form.lien.label }}</label>
+                                    {{ form.lien(class="form-control", placeholder="URL de l'article") }}
+                                    {% if form.lien.errors %}
+                                        <span class="text-danger">{{ form.lien.errors[0] }}</span>
+                                    {% endif %}
+                                </div>
+                            
+                                <!-- Bouton Soumettre -->
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                                </div>
+                            </form>
+                            
+                        </div>
+                    </div>
+                    <!-- End of Form Card -->
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- End of Section -->
+</main>
+
+{% include 'includes/footer-admin.html' %}
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE -->
+{% block javascripts %}
+{% include 'includes/scripts-admin.html' %}
+{% endblock javascripts %}

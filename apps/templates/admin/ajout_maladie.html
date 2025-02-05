@@ -1,0 +1,99 @@
+{% extends "layouts/base_form.html" %}
+
+{% block title %} Ajout ou édition d'un ingrédient {% endblock %}
+
+<!-- Specific Page CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+<main>
+    {% include 'includes/preloader.html' %}
+    <!-- Section -->
+    <section class="section section-lg pt-6">
+        <div class="container">
+            <div class="row justify-content-center mb-5 mb-lg-6">
+                <div class="col-12 col-lg-8">
+                    <!-- Form Card -->
+                    <div class="card border-0 p-2 p-md-3 p-lg-5">
+                        <div class="card-header bg-white border-0 text-center">
+                            <h2>Ajouter ou éditer une maladie</h2>
+                            <p>Complétez le formulaire pour enregistrer une maladie</p>
+                            <a href="/maladie" class="btn btn-secondary btn-sm">
+                                Retour
+                            </a>
+                            <br />
+                            <span class="font-weight-normal">
+                                {% if msg %}
+                                    <span class="{{ 'text-success' if success else 'text-danger' }}">
+                                        {{ msg | safe }}
+                                    </span>
+                                {% else %}
+                                    Remplissez les informations demandées ci-dessous
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="card-body px-0 pt-0">
+                            <form method="POST" action="" enctype="multipart/form-data">
+                                {{ form.hidden_tag() }}
+                            
+                                <!-- Champ Nom Commun -->
+                                <div class="mb-4">
+                                    <label for="nom_commun">{{ form.nom_commun.label }}</label>
+                                    {{ form.nom_commun(class="form-control", placeholder="Ex. : Paludisme") }}
+                                    {% if form.nom_commun.errors %}
+                                        <span class="text-danger">{{ form.nom_commun.errors[0] }}</span>
+                                    {% endif %}
+                                </div>
+                            
+                                <!-- Champ Nom en Fon -->
+                                <div class="mb-4">
+                                    <label for="nom_fon">{{ form.nom_fon.label }}</label>
+                                    {{ form.nom_fon(class="form-control", placeholder="Nom en langue Fon") }}
+                                    {% if form.nom_fon.errors %}
+                                        <span class="text-danger">{{ form.nom_fon.errors[0] }}</span>
+                                    {% endif %}
+                                </div>
+                            
+                                <!-- Champ Propriétés -->
+                                <div class="mb-4">
+                                    <label for="proprietes">{{ form.proprietes.label }}</label>
+                                    {{ form.proprietes(class="form-control", placeholder="Décrivez les propriétés de la maladie") }}
+                                    {% if form.proprietes.errors %}
+                                        <span class="text-danger">{{ form.proprietes.errors[0] }}</span>
+                                    {% endif %}
+                                </div>
+                            
+                                <!-- Champ Images -->
+                                <div class="mb-3">
+                                    <label for="images">{{ form.images.label }}</label>
+                                    {{ form.images(class="form-control") }}
+                                    {% if form.images.errors %}
+                                        <span class="text-danger">{{ form.images.errors[0] }}</span>
+                                    {% endif %}
+                                </div>
+                            
+                                <!-- Bouton Soumettre -->
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                                </div>
+                            </form>
+                            
+                        </div>
+                    </div>
+                    <!-- End of Form Card -->
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- End of Section -->
+</main>
+
+{% include 'includes/footer-admin.html' %}
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE -->
+{% block javascripts %}
+{% include 'includes/scripts-admin.html' %}
+{% endblock javascripts %}

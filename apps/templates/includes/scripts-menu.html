@@ -1,0 +1,33 @@
+<script src="static/menu/js/jquery-3.3.1.min.js"></script>
+<script src="static/menu/js/bootstrap.min.js"></script>
+<script src="static/menu/js/jquery.nice-select.min.js"></script>
+<script src="static/menu/js/jquery-ui.min.js"></script>
+<script src="static/menu/js/jquery.slicknav.js"></script>
+<script src="static/menu/js/mixitup.min.js"></script>
+<script src="static/menu/js/owl.carousel.min.js"></script>
+<script src="static/menu/js/main.js"></script>
+
+<script>
+    // Fonction pour afficher/masquer la section des commentaires
+    function toggleComments(id) {
+      var commentsSection = document.getElementById(id);
+      if (commentsSection.style.display === "none") {
+        commentsSection.style.display = "block";
+      } else {
+        commentsSection.style.display = "none";
+      }
+    }
+
+
+
+  
+    function toggleComments(sectionId) {
+    const section = document.getElementById(sectionId);
+    if (section.style.display === "none" || section.style.display === "") {
+        section.style.display = "block";
+    } else {
+        section.style.display = "none";
+    }
+}
+
+</script>
