@@ -29,6 +29,20 @@ from sqlalchemy import or_
 
 from sqlalchemy import or_
 
+@property
+def nombre_likes(self):
+    return self.likes.count()
+
+
+@property
+def nombre_partages(self):
+    return self.partages.count()
+
+@property
+def nombre_commentaires(self):
+    return self.commentaires.count()
+
+
 def recherche_mot_cle(mot_cle):
     # Normalisation du mot-clé pour éviter des erreurs avec des valeurs nulles ou invalides
     mot_cle = mot_cle.strip() if mot_cle else ""
@@ -61,7 +75,7 @@ def recherche_mot_cle(mot_cle):
             Remede.description.ilike(f"%{mot_cle}%"),
             Remede.preparation.ilike(f"%{mot_cle}%"),
             Remede.indications.ilike(f"%{mot_cle}%"),
-            Remede.dosage.ilike(f"%{mot_cle}%"),
+            Remede.posologie.ilike(f"%{mot_cle}%"),
             Remede.precautions.ilike(f"%{mot_cle}%"),
             Remede.liens.ilike(f"%{mot_cle}%")
         )
@@ -93,16 +107,19 @@ def get_remedes_data(remedes):
     remedes_data = []
     for remede in remedes:
         remede_info = {
+            "id": remede.id,
             "images": remede.images,
             "nom": remede.nom,
             "description": remede.description,
             "indications": remede.indications,
-            "dosage": remede.dosage,
+            "posologie": remede.posologie ,
             "liens": remede.liens,
             "ingredients": [],
             "maladies": [],
             "articles": [],
-            "commentaires": []
+            "commentaires": [],
+            "likes": remede.nombre_likes,  # Utilisation de la propriété pour compter les likes
+            "partages": remede.nombre_partages  # Utilisation de la propriété pour compter les partages
         }
 
         # Récupérer les ingrédients du remède
@@ -131,11 +148,15 @@ def get_remedes_data(remedes):
         # Récupérer les commentaires associés au remède
         for commentaire in remede.commentaires:
             commentaire_info = {
-                "username": commentaire.user.username,
-                "comment": commentaire.comment
+               "user_id": commentaire.user_id if commentaire.user_id else "Utilisateur inconnu",
+                "username": commentaire.user.username if commentaire.user else "Utilisateur inconnu",
+                "comment": commentaire.comment,
+                "date": commentaire.date_ajout
             }
             remede_info["commentaires"].append(commentaire_info)
-        
+
         remedes_data.append(remede_info)
-    
+
     return remedes_data
+
+

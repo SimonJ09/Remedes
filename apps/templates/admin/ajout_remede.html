@@ -58,8 +58,8 @@
                                             </div>
                                             <div class="modal-body">
                                                 {% for mal in maux %}
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" value="{{ mal.id }}" id="mal{{ mal.id }}">
+                                                <div  id="mauxModal" class="form-check">
+                                                    <input class="form-check-input" type="checkbox"   value="{{ mal.id }}" id="mal{{ mal.id }}">
                                                     <label class="form-check-label" for="mal{{ mal.id }}">
                                                         {{ mal.nom_commun }}
                                                     </label>
@@ -114,10 +114,10 @@
 
                                 <!-- Champ Dosage -->
                                 <div class="mb-4">
-                                    <label for="dosage">{{ form.dosage.label }}</label>
-                                    {{ form.dosage(class="form-control", placeholder="Propriétés thérapeutiques, nutritives, etc.") }}
-                                    {% if form.dosage.errors %}
-                                        <span class="text-danger">{{ form.dosage.errors[0] }}</span>
+                                    <label for="dosage">{{ form.posologie.label }}</label>
+                                    {{ form.posologie(class="form-control", placeholder="nutritives, etc.") }}
+                                    {% if form.posologie.errors %}
+                                        <span class="text-danger">{{ form.posologie.errors[0] }}</span>
                                     {% endif %}
                                 </div>
 
@@ -175,14 +175,14 @@
                                                 <h5 class="modal-title" id="ingredientsModalLabel">Sélectionner les ingrédients</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
-                                            <div class="modal-body">
+                                            <div  id="ingredientsModal" class="modal-body">
                                                 {% for ingredient in ingredients %}
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" value="{{ ingredient.id }}" id="ingredient{{ ingredient.id }}">
+                                                    <input class="form-check-input" type="checkbox"  value="{{ ingredient.id }}" id="ingredient{{ ingredient.id }}">
                                                     <label class="form-check-label" for="ingredient{{ ingredient.id }}">
                                                         {{ ingredient.nom_commun }}
                                                     </label>
-                                                    <input type="text" class="form-control mt-2" id="quantity{{ ingredient.id }}" placeholder="Quantité">
+                                                    <input type="text" class="form-control mt-2",   id="quantity{{ ingredient.id }}" placeholder="Quantité">
                                                 </div>
                                                 {% endfor %}
                                             </div>
@@ -228,10 +228,10 @@
                                                 <h5 class="modal-title" id="articlesModalLabel">Sélectionner les articles associés</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
-                                            <div class="modal-body">
+                                            <div id="articlesModal" class="modal-body">
                                                 {% for article in articles %}
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" value="{{ article.id }}" id="article{{ article.id }}">
+                                                    <input class="form-check-input" type="checkbox"  value="{{ article.id }}" id="article{{ article.id }}">
                                                     <label class="form-check-label" for="article{{ article.id }}">
                                                         {{ article.titre }}
                                                     </label>

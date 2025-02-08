@@ -58,7 +58,7 @@ class Remede(db.Model):
     latitude = db.Column(db.Float)  # Coordonnées géographiques
     longitude = db.Column(db.Float)
     indications = db.Column(db.Text)
-    dosage = db.Column(db.Text)
+    posologie = db.Column(db.Text)
     precautions = db.Column(db.Text)
     video = db.Column(db.String(255))  # Chemin ou URL de la vidéo
     images = db.Column(db.String(255))  # Chemin ou URL de l'image
@@ -73,6 +73,64 @@ class Remede(db.Model):
     __table_args__ = (
         db.UniqueConstraint('nom', name='unique_nom_remede'),
     )
+    likes = db.relationship('Like', backref='remede', lazy='dynamic')
+    commentaires = db.relationship('Commentaire', backref='remede', lazy='dynamic')
+    partages = db.relationship('Partage', backref='remede', lazy='dynamic')
+
+    @property
+    def nombre_likes(self):
+        return self.likes.count()
+
+    @property
+    def nombre_commentaires(self):
+        return self.commentaires.count()
+
+    @property
+    def nombre_partages(self):
+        return self.partages.count()
+
+
+
+
+class Like(db.Model):
+    __tablename__ = 'likes'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('Users.id'))
+    remede_id = db.Column(db.Integer, db.ForeignKey('remedes.id'), nullable=False)
+    # Relation avec le modèle User
+    
+
+    # Contraintes pour éviter qu'un utilisateur "like" un remède plusieurs fois
+    __table_args__ = (
+        db.UniqueConstraint('user_id', 'remede_id', name='unique_user_like'),
+    )
+
+
+class Commentaire(db.Model):
+    __tablename__ = 'commentaires'
+    id = db.Column(db.Integer, primary_key=True)
+    remede_id = db.Column(db.Integer, db.ForeignKey('remedes.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('Users.id'))
+    comment = db.Column(db.String(255), nullable=False)
+    date_ajout = db.Column(db.Date, default=db.func.current_date())
+    date_mise_a_jour = db.Column(db.Date, onupdate=db.func.current_date())
+   # Relation avec User
+    user = db.relationship('Users', backref='commentaires')
+
+
+class Partage(db.Model):
+    __tablename__ = 'partages'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('Users.id'))
+    remede_id = db.Column(db.Integer, db.ForeignKey('remedes.id'), nullable=False)
+    date_partage = db.Column(db.Date, default=db.func.current_date())
+    # Relation avec le modèle User
+    
+    # Contraintes pour éviter qu'un utilisateur partage un remède plusieurs fois
+    __table_args__ = (
+        db.UniqueConstraint('user_id', 'remede_id', name='unique_user_partage'),
+    )
+
     
 # Table de liaison entre Remèdes et Ingrédients
 class RemedeIngredient(db.Model):
@@ -124,20 +182,7 @@ class Article_Ingredient(db.Model):
     article_id = db.Column(db.Integer, db.ForeignKey('articles.id'), primary_key=True)
     ingredient_id = db.Column(db.Integer, db.ForeignKey('ingredients.id'), primary_key=True)
 
-# Table des Commentaires
-class Commentaire(db.Model):
-    __tablename__ = 'commentaires'
-    id = db.Column(db.Integer, primary_key=True)
-    like = db.Column(db.Integer, default=0)
-    user_id = db.Column(db.Integer, db.ForeignKey('Users.id'))
-    remede_id = db.Column(db.Integer, db.ForeignKey('remedes.id'))
-    comment = db.Column(db.String(255), nullable=False)
-    date_ajout = db.Column(db.Date, default=db.func.current_date())
-    date_mise_a_jour = db.Column(db.Date, onupdate=db.func.current_date())
 
-    # Relations
-    user = db.relationship('Users', backref='commentaires')
-    remede = db.relationship('Remede', backref='commentaires')
 
 # Table des Utilisateurs
 class Users(db.Model, UserMixin):

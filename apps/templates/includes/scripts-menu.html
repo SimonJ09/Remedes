@@ -8,26 +8,69 @@
 <script src="static/menu/js/main.js"></script>
 
 <script>
-    // Fonction pour afficher/masquer la section des commentaires
-    function toggleComments(id) {
-      var commentsSection = document.getElementById(id);
-      if (commentsSection.style.display === "none") {
-        commentsSection.style.display = "block";
-      } else {
-        commentsSection.style.display = "none";
-      }
+    // Fonction pour liker un remède
+    function likeRemede(remedeId) {
+        const userId = {{ current_user.id }};
+        fetch(`{{ url_for('remedes_blueprint.like_remede', remede_id=0) }}`.replace('0', remedeId), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ user_id: userId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById(`like-count-${remedeId}`).textContent = data.nombre_likes;
+            }
+            alert(data.message);
+        })
+        .catch(error => console.error('Erreur:', error));
     }
 
-
-
-  
-    function toggleComments(sectionId) {
-    const section = document.getElementById(sectionId);
-    if (section.style.display === "none" || section.style.display === "") {
-        section.style.display = "block";
-    } else {
-        section.style.display = "none";
+    // Fonction pour partager un remède
+    function partagerRemede(remedeId) {
+        const userId = {{ current_user.id }};
+        fetch(`{{ url_for('remedes_blueprint.partager_remede', remede_id=0) }}`.replace('0', remedeId), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ user_id: userId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById(`share-count-${remedeId}`).textContent = data.nombre_partages;
+            }
+            alert(data.message);
+        })
+        .catch(error => console.error('Erreur:', error));
     }
-}
 
+    // Fonction pour ajouter un commentaire
+    function ajouterCommentaire(event, remedeId) {
+        event.preventDefault(); // Empêche le rechargement de la page
+        const userId = {{ current_user.id }};
+        const comment = document.getElementById(`comment-${remedeId}`).value;
+
+        fetch(`{{ url_for('remedes_blueprint.ajouter_commentaire', remede_id=0) }}`.replace('0', remedeId), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ user_id: userId, comment: comment })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                document.getElementById(`comment-${remedeId}`).value = ''; // Réinitialiser le champ de texte
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => console.error('Erreur:', error));
+    }
 </script>
+

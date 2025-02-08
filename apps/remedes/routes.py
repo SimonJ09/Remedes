@@ -11,7 +11,7 @@ from apps import db, login_manager
 from apps.authentication.models import Users
 from apps.authentication.models import Maladie
 from apps.authentication.models import Ingredient
-from apps.authentication.models import Remede
+from apps.authentication.models import Remede, Like, Commentaire, Partage
 from apps.authentication.models import RemedeIngredient
 from apps.authentication.models import Article_Ingredient, Article
 from apps.authentication.models import Article_Remede
@@ -31,7 +31,50 @@ from sqlalchemy.orm import aliased
 from sqlalchemy import or_
 
 
-# Exemple d'utilisation dans une vue Flask
+
+@blueprint.route('/like_remede/<int:remede_id>', methods=['POST'])
+def like_remede(remede_id):
+    user_id = request.json.get('user_id')
+    if not Like.query.filter_by(user_id=user_id, remede_id=remede_id).first():
+        like = Like(user_id=user_id, remede_id=remede_id)
+        db.session.add(like)
+        db.session.commit()
+        message = "Vous avez aimé ce remède."
+    else:
+        message = "Vous avez déjà aimé ce remède."
+
+    nombre_likes = Like.query.filter_by(remede_id=remede_id).count()
+    return jsonify({'success': True, 'message': message, 'nombre_likes': nombre_likes})
+
+
+@blueprint.route('/ajouter_commentaire/<int:remede_id>', methods=['POST'])
+def ajouter_commentaire(remede_id):
+    user_id = request.json.get('user_id')
+    comment = request.json.get('comment')
+    if comment:
+        commentaire = Commentaire(user_id=user_id, remede_id=remede_id, comment=comment)
+        db.session.add(commentaire)
+        db.session.commit()
+        return jsonify({'success': True, 'message': "Commentaire ajouté avec succès."})
+    return jsonify({'success': False, 'message': "Le commentaire ne peut pas être vide."})
+
+
+
+@blueprint.route('/partager_remede/<int:remede_id>', methods=['POST'])
+def partager_remede(remede_id):
+    user_id = request.json.get('user_id')
+    if not Partage.query.filter_by(user_id=user_id, remede_id=remede_id).first():
+        partage = Partage(user_id=user_id, remede_id=remede_id)
+        db.session.add(partage)
+        db.session.commit()
+        message = "Remède partagé avec succès."
+    else:
+        message = "Vous avez déjà partagé ce remède."
+
+    nombre_partages = Partage.query.filter_by(remede_id=remede_id).count()
+    return jsonify({'success': True, 'message': message, 'nombre_partages': nombre_partages})
+
+
 
 
 @blueprint.route('/remedes', methods=['GET', 'POST'])
@@ -79,6 +122,8 @@ def remedes():
             is_admin=is_admin,
             mot_cle=mot_cle,
         )
+
+
 
 
 

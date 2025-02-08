@@ -239,12 +239,10 @@ def edit_maladie(id):
 def delete_maladie(id):
     # Récupérer la maladie par ID
     maladie = Maladie.query.get_or_404(id)
-
     try:
         # Supprimer la maladie de la base de données
         db.session.delete(maladie)
         db.session.commit()
-
         flash("Maladie supprimée avec succès !", "success")
     except Exception as e:
         db.session.rollback()
@@ -270,19 +268,11 @@ def delete_selected_maux():
     try:
         # Récupérer les objets Maladie à partir des IDs
         maux_to_delete = Maladie.query.filter(Maladie.id.in_(ids)).all()
-
         for mal in maux_to_delete:
-            # Supprimer les liaisons dans d'autres tables si nécessaire (exemple : Articles, Ingredients, etc.)
-            # Par exemple, si la maladie est liée à des articles :
-            for article in mal.articles:
-                db.session.delete(article)
-            # Supprimer la maladie elle-même
             db.session.delete(mal)
-
         # Commit les changements dans la base de données
         db.session.commit()
         return jsonify({'success': True, 'message': f"{len(maux_to_delete)} mal(s) supprimé(s) avec succès."})
-
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'message': f"Erreur : {str(e)}"}), 500
@@ -416,7 +406,7 @@ def delete_selected_articles():
 # ------------------------------remedes-----------------------------
 #----------------------------------------------------------------
 
-@blueprint.route('/delete_selected_remede', methods=['GET','POST'])
+@blueprint.route('/delete_selected_remede', methods=['GET', 'POST'])
 @login_required
 def delete_selected_remede():
     # Vérification des permissions d'accès
@@ -431,19 +421,42 @@ def delete_selected_remede():
     try:
         remedes_to_delete = Remede.query.filter(Remede.id.in_(ids)).all()
 
+        if not remedes_to_delete:
+            return jsonify({'success': False, 'message': "Aucun remède trouvé avec ces IDs."}), 404
+
         for remede in remedes_to_delete:
-            # Suppression des liaisons avec les autres tables avant de supprimer le remède
+            # Suppression des partages associés
+            if hasattr(remede, 'partages') and remede.partages:
+                for partage in remede.partages:
+                    db.session.delete(partage)
+
+            # Suppression des likes associés
+            if hasattr(remede, 'likes') and remede.likes:
+                for like in remede.likes:
+                    db.session.delete(like)
+                    
+
+            # Suppression des commentaires associés
+            if hasattr(remede, 'commentaires') and remede.commentaires:
+                for commentaire in remede.commentaires:
+                    db.session.delete(commentaire)
+
+
             # Suppression des maladies associées
-            for maladie in remede.maladies:
-                remede.maladies.remove(maladie)
+            if hasattr(remede, 'maladie') and remede.maladie:
+                for remede_maladie in remede.maladie:
+                    remede.maladie.remove(remede_maladie.maladie)
 
             # Suppression des articles associés
-            for article in remede.articles:
-                remede.articles.remove(article)
-
+            if hasattr(remede, 'articles') and remede.articles:
+                for article in remede.articles:
+                    remede.articles.remove(article)
+                
             # Suppression des ingrédients associés
-            for ingredient in remede.ingredients:
-                remede.ingredients.remove(ingredient)
+            if hasattr(remede, 'ingredients') and remede.ingredients:
+                for ingredient in remede.ingredients:
+                    remede.ingredients.remove(ingredient)
+                    
 
             # Suppression du remède lui-même
             db.session.delete(remede)
@@ -454,6 +467,7 @@ def delete_selected_remede():
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'message': f"Erreur : {str(e)}"}), 500
+
 
 @blueprint.route('/dashboard_remede')
 @login_required
@@ -470,305 +484,402 @@ import json
 @login_required
 def ajout_remede():
     form = RemedeForm()
-    # Récupère la liste de tous les ingrédients pour alimenter ton formulaire
-    all_ingredients = Ingredient.query.all()
-    articles = Article.query.all()
-    maux = Maladie.query.all()
+    # Récupération de tous les ingrédients, articles et maux
+    try:
+        all_ingredients = Ingredient.query.all()
+        articles = Article.query.all()
+        maux = Maladie.query.all()
+    except Exception as e:
+        return f"Erreur lors de la récupération des données initiales : {str(e)}"
+
     if form.validate_on_submit():
         try:
-            # Gestion des fichiers image et vidéo
+            # Gestion des fichiers image
+            try:
+                image_file = request.files.get('images')
+                filename_image = None
+                if image_file:
+                    filename_image = save_file(image_file, subfolder="remedes")
+                    if not filename_image:
+                        return render_template(
+                            'admin/ajout_remede.html',
+                            msg='Format de fichier image non valide.',
+                            form=form, ingredients=all_ingredients, maux=maux, articles=articles
+                        )
+            except Exception as e:
+                return f"Erreur lors du traitement de l'image : {str(e)}"
+
+            # Gestion des fichiers vidéo
+            try:
+                video_file = request.files.get('video')
+                filename_video = None
+                if video_file:
+                    filename_video = save_file(video_file, subfolder="remedes")
+                    if not filename_video:
+                        return render_template(
+                            'admin/ajout_remede.html',
+                            msg='Format de fichier vidéo non valide.',
+                            form=form, ingredients=all_ingredients, maux=maux, articles=articles
+                        )
+            except Exception as e:
+                return f"Erreur lors du traitement de la vidéo : {str(e)}"
+
+            # Traitement des ingrédients sélectionnés
+            try:
+                ingredients_json = request.form.get('ingredients')
+                selected_ingredients = []
+                if ingredients_json:
+                    selected_ingredients = json.loads(ingredients_json)
+                    if not selected_ingredients:
+                        return render_template(
+                            'admin/ajout_remede.html',
+                            msg='Ingrédients non sélectionnés.',
+                            form=form, ingredients=all_ingredients, maux=maux, articles=articles
+                        )
+            except Exception as e:
+                return f"Erreur lors du traitement des ingrédients : {str(e)}"
+
+            # Traitement des articles sélectionnés
+            try:
+                articles_json = request.form.get('articles')
+                selected_articles = []
+                if articles_json:
+                    selected_articles = json.loads(articles_json)
+                    if not selected_articles:
+                        return render_template(
+                            'admin/ajout_remede.html',
+                            msg='Articles non sélectionnés.',
+                            form=form, ingredients=all_ingredients, maux=maux, articles=articles
+                        )
+            except Exception as e:
+                return f"Erreur lors du traitement des articles : {str(e)}"
+
+            # Traitement des maux sélectionnés
+            try:
+                maux_json = request.form.get('maux')
+                selected_maux = []
+                if maux_json:
+                    selected_maux = json.loads(maux_json)
+                    if not selected_maux:
+                        return render_template(
+                            'admin/ajout_remede.html',
+                            msg='Maux non sélectionnés.',
+                            form=form, ingredients=all_ingredients, maux=maux, articles=articles
+                        )
+            except Exception as e:
+                return f"Erreur lors du traitement des maux : {str(e)}"
+
+            # Création du remède
+            try:
+                new_remede = Remede(
+                    nom=form.nom.data,
+                    description=form.description.data,
+                    preparation=form.preparation.data,
+                    latitude=form.latitude.data,
+                    longitude=form.longitude.data,
+                    indications=form.indications.data,
+                    posologie =form.posologie.data,
+                    precautions=form.precautions.data,
+                    video=filename_video,
+                    images=filename_image,
+                    liens=form.liens.data,
+                    user_id=current_user.id
+                )
+                db.session.add(new_remede)
+                db.session.commit()
+            except Exception as e:
+                db.session.rollback()
+                return f"Erreur lors de la création du remède : {str(e)}"
+
+            # Ajout des ingrédients au remède
+            try:
+                for ing_data in selected_ingredients:
+                    ingredient_id = ing_data.get('id')
+                    quantity = ing_data.get('quantity')
+                    ingredient = Ingredient.query.get(ingredient_id)
+                    if ingredient:
+                        remede_ingredient = RemedeIngredient(
+                            remede_id=new_remede.id,
+                            ingredient_id=ingredient.id,
+                            quantite=quantity
+                        )
+                        db.session.add(remede_ingredient)
+            except Exception as e:
+                db.session.rollback()
+                return f"Erreur lors de l'association des ingrédients : {str(e)}"
+
+            # Ajout des articles au remède
+            try:
+                for art_data in selected_articles:
+                    article_id = art_data.get('id')
+                    article = Article.query.get(article_id)
+                    if article:
+                        article_remede = Article_Remede(
+                            remede_id=new_remede.id,
+                            article_id = article.id,
+                        )
+                        db.session.add(article_remede)
+            except Exception as e:
+                db.session.rollback()
+                return f"Erreur lors de l'association des articles : {str(e)}"
+
+            # Ajout des maux au remède
+            try:
+                for mal_data in selected_maux:
+                    mal_id = mal_data.get('id')
+                    mal = Maladie.query.get(mal_id)
+                    if mal:
+                        remedes_maladie = RemedeMaladie(
+                            remede_id=new_remede.id,
+                            maladie_id=mal.id
+                        )
+                        db.session.add(remedes_maladie)
+            except Exception as e:
+                db.session.rollback()
+                return f"Erreur lors de l'association des maux : {str(e)}"
+
+            # Commit final
+            try:
+                db.session.commit()
+            except Exception as e:
+                db.session.rollback()
+                return f"Erreur lors du commit final : {str(e)}"
+
+            # Retour au formulaire avec un message de succès
+            return render_template(
+                'admin/ajout_remede.html',
+                msg='Remède ajouté avec succès !',
+                form=form, ingredients=all_ingredients, maux=maux, articles=articles
+            )
+
+        except IntegrityError:
+            db.session.rollback()
+            return render_template(
+                'admin/ajout_remede.html',
+                msg="Le remède existe déjà. Veuillez vérifier les informations.",
+                form=form, ingredients=all_ingredients, maux=maux, articles=articles
+            )
+
+        except Exception as e:
+            db.session.rollback()
+            return f"Erreur générale : {str(e)}"
+
+    return render_template('admin/ajout_remede.html', form=form, ingredients=all_ingredients, maux=maux, articles=articles)
+
+@blueprint.route('/edit_remede/<int:remede_id>', methods=['GET', 'POST'])
+@login_required
+def edit_remede(remede_id):
+    # Récupération du remède par son ID
+    remede = Remede.query.get_or_404(remede_id)
+    # Préparation des données pour selected_ingredients
+    selected_ingredients = remede.ingredients  # La relation 'ingredients' peut être vide
+
+    selected_ingredients_data = [
+        {
+            "id": ingredient.id,
+            "nom_commun": ingredient.nom_commun,  # Utilisation de 'nom_commun' au lieu de 'name' 
+            "nom_scientifique": ingredient.nom_scientifique,  # Ajoute le nom scientifique si nécessaire
+            "quantite": remede_ingredient.quantite  # La quantité spécifique dans ce remède
+        }
+        for remede_ingredient in selected_ingredients
+        for ingredient in [remede_ingredient.ingredient]
+    ] if selected_ingredients else []  # Si aucun ingrédient, renvoie une liste vide
+
+    # Préparation des données pour selected_maux
+    selected_maux = remede.maladie  # La relation 'maladie' peut aussi être vide
+
+    selected_maux_data = [
+        {
+            "id": maladie.id,
+            "nom_commun": maladie.nom_commun,  # Utilisation de 'nom_commun' et 'nom_fon' pour la maladie
+            "nom_fon": maladie.nom_fon
+        }
+        for remede_maladie in selected_maux
+        for maladie in [remede_maladie.maladie]
+    ] if selected_maux else []  # Si aucune maladie, renvoie une liste vide
+
+    # Préparation des données pour selected_articles
+    selected_articles = remede.articles  # La relation 'articles' peut être vide
+
+    selected_articles_data = [
+        {
+            "id": article.id,
+            "titre": article.titre,  # Utilisation de 'titre' pour le titre de l'article
+            "auteur": article.auteur,  # Ajoute l'auteur si nécessaire
+            "resume": article.resume  # Résumé de l'article, si nécessaire
+        }
+        for article in selected_articles
+    ] if selected_articles else []  # Si aucun article, renvoie une liste vide
+
+    remede_data = {
+        "nom": remede.nom,
+        "description": remede.description,
+        "preparation": remede.preparation,
+        "latitude": remede.latitude,
+        "longitude": remede.longitude,
+        "indications": remede.indications,
+        "posologie": remede.posologie ,
+        "precautions": remede.precautions,
+        "video": remede.video,
+        "images": remede.images,
+        "liens": remede.liens,
+        # Assurez-vous que toutes les autres données nécessaires sont sérialisables
+    }
+
+    # Initialisation du formulaire
+    form = RemedeForm(obj=remede)
+
+    # Récupération des autres données nécessaires
+    try:
+        all_ingredients = Ingredient.query.all()
+        articles = Article.query.all()
+        maux = Maladie.query.all()
+    except Exception as e:
+        return f"Erreur lors de la récupération des données initiales : {str(e)}"
+
+    # Si le formulaire est validé
+    if form.validate_on_submit():
+        try:
+            # Gestion des fichiers image
             image_file = request.files.get('images')
-            filename_image = None
+            filename_image = remede.images  # Conserver l'image existante si aucune nouvelle n'est soumise
             if image_file:
                 filename_image = save_file(image_file, subfolder="remedes")
                 if not filename_image:
                     return render_template(
-                        'admin/ajout_remede.html',
+                        'admin/edit_remede.html',
                         msg='Format de fichier image non valide.',
-                        form=form, ingredients=all_ingredients,  maux =  maux, articles = articles
+                        form=form, remede=remede, ingredients=all_ingredients, maux=maux, articles=articles,  selected_ingredients=selected_ingredients_data,
+    selected_maux=selected_maux_data,
+    selected_articles=selected_articles_data
                     )
 
+            # Gestion des fichiers vidéo
             video_file = request.files.get('video')
-            filename_video = None
+            filename_video = remede.video  # Conserver la vidéo existante si aucune nouvelle n'est soumise
             if video_file:
                 filename_video = save_file(video_file, subfolder="remedes")
                 if not filename_video:
                     return render_template(
-                        'admin/ajout_remede.html',
+                        'admin/edit_remede.html',
                         msg='Format de fichier vidéo non valide.',
-                        form=form, ingredients=all_ingredients,  maux =  maux , articles = articles
+                        form=form, remede=remede_data, ingredients=all_ingredients, maux=maux, articles=articles , selected_ingredients=selected_ingredients_data,
+    selected_maux=selected_maux_data,
+    selected_articles=selected_articles_data
                     )
 
-            # Récupérer et convertir les données JSON des ingrédients sélectionnés
+            # Traitement des ingrédients sélectionnés
             ingredients_json = request.form.get('ingredients')
             selected_ingredients = []
             if ingredients_json:
                 selected_ingredients = json.loads(ingredients_json)
                 if not selected_ingredients:
                     return render_template(
-                        'admin/ajout_remede.html',
+                        'admin/edit_remede.html',
                         msg='Ingrédients non sélectionnés.',
-                        form=form, ingredients=all_ingredients,  maux=  maux , articles = articles
+                        form=form, remede=remede_data, ingredients=all_ingredients, maux=maux, articles=articles,  selected_ingredients=selected_ingredients_data,
+    selected_maux=selected_maux_data,
+    selected_articles=selected_articles_data
                     )
-                
-                
-                
+
+            # Traitement des articles sélectionnés
             articles_json = request.form.get('articles')
             selected_articles = []
             if articles_json:
                 selected_articles = json.loads(articles_json)
-                if not selected_articles :
+                if not selected_articles:
                     return render_template(
-                        'admin/ajout_remede.html',
-                        msg='articles non sélectionnés.',
-                        form=form, ingredients=all_ingredients ,  maux = maux , articles = articles
+                        'admin/edit_remede.html',
+                        msg='Articles non sélectionnés.',
+                        form=form, remede=remede_data, ingredients=all_ingredients, maux=maux, articles=articles ,  selected_ingredients=selected_ingredients_data,
+    selected_maux=selected_maux_data,
+    selected_articles=selected_articles_data
                     )
-                
+
+            # Traitement des maux sélectionnés
             maux_json = request.form.get('maux')
             selected_maux = []
             if maux_json:
                 selected_maux = json.loads(maux_json)
                 if not selected_maux:
                     return render_template(
-                        'admin/ajout_remede.html',
-                        msg='maux non sélectionnés.',
-                        form=form, ingredients=all_ingredients ,  maux=  maux , articles = articles
-                    )            
-            
-           
-            # Créer le remède
-            new_remede = Remede(
-                nom=form.nom.data,
-                description=form.description.data,
-                preparation=form.preparation.data,
-                latitude=form.latitude.data,
-                longitude=form.longitude.data,
-                indications=form.indications.data,
-                dosage=form.dosage.data,
-                precautions=form.precautions.data,
-                video=filename_video,
-                images=filename_image,
-                liens=form.liens.data,
-                user_id=current_user.id
-            )
-            
-            db.session.add(new_remede)
-            db.session.commit()  # Commit pour générer l'ID du remède
-
-            # Ajouter les ingrédients sélectionnés au remède
-            for ing_data in selected_ingredients:
-                # Récupère l'ID et la quantité depuis l'objet JSON
-                ingredient_id = ing_data.get('id')
-                quantity = ing_data.get('quantity')
-                
-                # Vérifie que l'ingrédient existe
-                ingredient = Ingredient.query.get(ingredient_id)
-                if ingredient:
-                    remede_ingredient = RemedeIngredient(
-                        remede_id=new_remede.id,
-                        ingredient_id=ingredient.id,
-                        quantite=quantity
-                    )
-                    db.session.add(remede_ingredient)
-
-
-            for ing_data in selected_articles:
-                # Récupère l'ID et la quantité depuis l'objet JSON
-                article_id = ing_data.get('id')
-                # Vérifie que l'ingrédient existe
-                article = Article.query.get(article_id)
-                if article:
-                    article_remede = Article_Remede(
-                        remede_id=new_remede.id,
-                        article_id = article.id,
-                    )
-                    db.session.add(article_remede)
-
-            for ing_data in selected_maux :
-                # Récupère l'ID et la quantité depuis l'objet JSON
-                mal_id = ing_data.get('id')
-                # Vérifie que l'ingrédient existe
-                mal = Maladie.query.get(mal_id)
-                if mal:
-                    remedes_maladie = RemedeMaladie(
-                        remede_id=new_remede.id,
-                        maladie_id =  mal_id
-                    )
-                    db.session.add(remedes_maladie)
-
-            db.session.commit()  # Commit final pour enregistrer les associations
-
-            # Message de succès et retour sur la page d'ajout
-            return render_template(
-                'admin/ajout_remede.html',
-                msg='Remède ajouté avec succès !',
-                form=form,
-                ingredients=all_ingredients ,  maux = maux , articles = articles
-            )
-
-        except IntegrityError:
-            db.session.rollback()
-            return render_template(
-                'admin/ajout_remede.html',
-                msg="Le remède existe déjà. Veuillez vérifier les informations.",
-                form=form,
-                ingredients=all_ingredients , maux =  maux, articles = articles
-            )
-
-        except Exception as e:
-            db.session.rollback()
-            return render_template(
-                'admin/ajout_remede.html',
-                msg=f"Une erreur s'est produite : {str(e)}",
-                form=form,
-                ingredients=all_ingredients , maux = maux ,articles = articles
-            )
-
-    return render_template('admin/ajout_remede.html', form=form, ingredients=all_ingredients, maux = maux, articles = articles)
-
-
-@blueprint.route('/editer_remede/<int:id>', methods=['GET', 'POST'])
-@login_required
-def editer_remede(id):
-    # Récupérer le remède existant
-    remede = Remede.query.get_or_404(id)
-    form = RemedeForm(obj=remede)
-
-    # Récupère la liste de tous les ingrédients, articles et maladies pour alimenter le formulaire
-    all_ingredients = Ingredient.query.all()
-    articles = Article.query.all()
-    maux = Maladie.query.all()
-
-    # Pré-sélectionner les ingrédients, articles et maladies associés au remède
-    selected_ingredients = [ri.ingredient_id for ri in remede.ingredients]
-    selected_articles = [ar.article_id for ar in remede.articles]
-    selected_maux = [rm.mal_id for rm in remede.maladie]
-
-    if form.validate_on_submit():
-        try:
-            # Gestion des fichiers image et vidéo
-            image_file = request.files.get('images')
-            filename_image = remede.images  # Garde l'image actuelle si aucune nouvelle image n'est téléchargée
-            if image_file:
-                filename_image = save_file(image_file, subfolder="remedes")
-                if not filename_image:
-                    return render_template(
                         'admin/edit_remede.html',
-                        msg='Format de fichier image non valide.',
-                        form=form, remede=remede, ingredients=all_ingredients, maux=maux, articles=articles
+                        msg='Maux non sélectionnés.',
+                        form=form, remede=remede_data, ingredients=all_ingredients, maux=maux, articles=articles ,  selected_ingredients=selected_ingredients_data,
+    selected_maux=selected_maux_data,
+    selected_articles=selected_articles_data
                     )
 
-            video_file = request.files.get('video')
-            filename_video = remede.video  # Garde la vidéo actuelle si aucune nouvelle vidéo n'est téléchargée
-            if video_file:
-                filename_video = save_file(video_file, subfolder="remedes")
-                if not filename_video:
-                    return render_template(
-                        'admin/edit_remede.html',
-                        msg='Format de fichier vidéo non valide.',
-                        form=form, remede=remede, ingredients=all_ingredients, maux=maux, articles=articles
-                    )
-
-            # Récupérer et convertir les données JSON des ingrédients, articles et maux sélectionnés
-            ingredients_json = request.form.get('ingredients')
-            selected_ingredients = []
-            if ingredients_json:
-                selected_ingredients = json.loads(ingredients_json)
-
-            articles_json = request.form.get('articles')
-            selected_articles = []
-            if articles_json:
-                selected_articles = json.loads(articles_json)
-
-            maux_json = request.form.get('maux')
-            selected_maux = []
-            if maux_json:
-                selected_maux = json.loads(maux_json)
-
-            # Mettre à jour les informations du remède
+            # Mise à jour du remède
             remede.nom = form.nom.data
             remede.description = form.description.data
             remede.preparation = form.preparation.data
             remede.latitude = form.latitude.data
             remede.longitude = form.longitude.data
             remede.indications = form.indications.data
-            remede.dosage = form.dosage.data
+            remede.posologie = form.posologie.data
             remede.precautions = form.precautions.data
             remede.video = filename_video
             remede.images = filename_image
             remede.liens = form.liens.data
 
-            db.session.commit()  # Commit pour mettre à jour le remède
+            db.session.commit()
 
-            # Mettre à jour les ingrédients associés
-            RemedeIngredient.query.filter(RemedeIngredient.remede_id == remede.id).delete()  # Supprimer les anciens liens
-            for ing_id in selected_ingredients:
-                ingredient = Ingredient.query.get(ing_id)
+            # Suppression des associations existantes (ingrédients, articles, maux)
+            RemedeIngredient.query.filter_by(remede_id=remede.id).delete()
+            Article_Remede.query.filter_by(remede_id=remede.id).delete()
+            RemedeMaladie.query.filter_by(remede_id=remede.id).delete()
+
+            # Ajout des nouvelles associations
+            for ing_data in selected_ingredients:
+                ingredient_id = ing_data.get('id')
+                quantity = ing_data.get('quantity')
+                ingredient = Ingredient.query.get(ingredient_id)
                 if ingredient:
-                    remede_ingredient = RemedeIngredient(remede_id=remede.id, ingredient_id=ingredient.id)
+                    remede_ingredient = RemedeIngredient(
+                        remede_id=remede.id,
+                        ingredient_id=ingredient.id,
+                        quantite=quantity
+                    )
                     db.session.add(remede_ingredient)
 
-            # Mettre à jour les articles associés
-            Article_Remede.query.filter(Article_Remede.remede_id == remede.id).delete()  # Supprimer les anciens liens
-            for ar_id in selected_articles:
-                article = Article.query.get(ar_id)
+            for art_data in selected_articles:
+                article_id = art_data.get('id')
+                article = Article.query.get(article_id)
                 if article:
-                    article_remede = Article_Remede(remede_id=remede.id, article_id=article.id)
+                    article_remede = Article_Remede(
+                        remede_id=remede.id,
+                        article_id=article.id,
+                    )
                     db.session.add(article_remede)
 
-            # Mettre à jour les maladies associées
-            RemedeMaladie.query.filter(RemedeMaladie.remede_id == remede.id).delete()  # Supprimer les anciens liens
-            for mal_id in selected_maux:
+            for mal_data in selected_maux:
+                mal_id = mal_data.get('id')
                 mal = Maladie.query.get(mal_id)
                 if mal:
-                    remedes_maladie = RemedeMaladie(remede_id=remede.id, mal_id=mal.id)
+                    remedes_maladie = RemedeMaladie(
+                        remede_id=remede.id,
+                        maladie_id=mal.id
+                    )
                     db.session.add(remedes_maladie)
 
-            db.session.commit()  # Commit final pour enregistrer toutes les associations
+            db.session.commit()
 
-            # Message de succès et retour sur la page d'édition
             return render_template(
                 'admin/edit_remede.html',
-                msg='Remède modifié avec succès !',
-                form=form,
-                remede=remede,
-                ingredients=all_ingredients,
-                maux=maux,
-                articles=articles
-            )
-
-        except IntegrityError:
-            db.session.rollback()
-            return render_template(
-                'admin/edit_remede.html',
-                msg="Le remède existe déjà. Veuillez vérifier les informations.",
-                form=form,
-                remede=remede,
-                ingredients=all_ingredients,
-                maux=maux,
-                articles=articles
+                msg='Remède mis à jour avec succès !',
+                form=form, remede=remede_data, ingredients=all_ingredients, maux=maux, articles=articles , selected_ingredients=selected_ingredients_data,
+    selected_maux=selected_maux_data,
+    selected_articles=selected_articles_data
             )
 
         except Exception as e:
             db.session.rollback()
-            return render_template(
-                'admin/edit_remede.html',
-                msg=f"Une erreur s'est produite : {str(e)}",
-                form=form,
-                remede=remede,
-                ingredients=all_ingredients,
-                maux=maux,
-                articles=articles
-            )
+            return f"Erreur lors de l'édition du remède : {str(e)}"
 
-    return render_template(
-        'admin/edit_remede.html', 
-        form=form, 
-        remede=remede, 
-        ingredients=all_ingredients, 
-        maux=maux, 
-        articles=articles
-    )
+    return render_template('admin/edit_remede.html', form=form, remede=remede_data, ingredients=all_ingredients, maux=maux, articles=articles,  selected_ingredients=selected_ingredients_data,
+    selected_maux=selected_maux_data,
+    selected_articles=selected_articles_data)
 
 
 @blueprint.route('/delete_remede/<int:id>', methods=['GET', 'POST'])
@@ -776,34 +887,28 @@ def editer_remede(id):
 def delete_remede(id):
     # Récupérer le remède existant
     remede = Remede.query.get_or_404(id)
-
+    remedes = Remede.query.all()
     try:
         # Supprimer les associations avec les ingrédients
         RemedeIngredient.query.filter(RemedeIngredient.remede_id == remede.id).delete()
-
         # Supprimer les associations avec les articles
         Article_Remede.query.filter(Article_Remede.remede_id == remede.id).delete()
-
         # Supprimer les associations avec les maladies
         RemedeMaladie.query.filter(RemedeMaladie.remede_id == remede.id).delete()
-
         # Supprimer le remède
         db.session.delete(remede)
-
         # Commit pour valider les suppressions
         db.session.commit()
-
         # Message de succès
         return render_template(
-            'admin/remedes.html',  # Tu peux rediriger vers une page avec la liste des remèdes
-            msg='Le remède a été supprimé avec succès !'
+            'admin/remede_list.html',  # Tu peux rediriger vers une page avec la liste des remèdes
+            message ='Le remède a été supprimé avec succès !',  remedes = remedes
         )
-
     except Exception as e:
         db.session.rollback()  # Annuler la transaction en cas d'erreur
         return render_template(
-            'admin/remedes.html',  # Rediriger vers la page des remèdes
-            msg=f"Une erreur s'est produite lors de la suppression du remède : {str(e)}"
+            'admin/remede_list.html',  # Rediriger vers la page des remèdes
+            message =f"Une erreur s'est produite lors de la suppression du remède : {str(e)}" , remedes=remedes
         )
 
 # ------------------------------Ingrédiant-----------------------------

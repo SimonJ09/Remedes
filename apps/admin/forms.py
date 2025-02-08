@@ -33,7 +33,7 @@ class RemedeForm(FlaskForm):
     latitude = FloatField('Latitude', validators=[Optional(), NumberRange(min=-90, max=90, message="La latitude doit être comprise entre -90 et 90")])
     longitude = FloatField('Longitude', validators=[Optional(), NumberRange(min=-180, max=180, message="La longitude doit être comprise entre -180 et 180")])
     indications = TextAreaField('Indications', validators=[Optional()])
-    dosage = TextAreaField('Dosage', validators=[Optional()])
+    posologie = TextAreaField('Dosage', validators=[Optional()])
     precautions = TextAreaField('Précautions', validators=[Optional()])
     images = FileField('Image', validators=[Optional(), FileAllowed(['jpg', 'png', 'jpeg'], 'Seules les images au format JPG, PNG ou JPEG sont autorisées')])
     video = FileField('Vidéo', validators=[Optional(), FileAllowed(['mp4', 'avi'], 'Seules les vidéos au format MP4 ou AVI sont autorisées')])

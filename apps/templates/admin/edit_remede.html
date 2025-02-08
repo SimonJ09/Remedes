@@ -23,7 +23,7 @@
                         <div class="card-header bg-white border-0 text-center">
                             <h2>Ajouter ou éditer un remède</h2>
                             <p>Complétez le formulaire pour enregistrer un remède</p>
-                            <a href="/dashboard-remede" class="btn btn-secondary btn-sm">
+                            <a href="/dashboard_remede" class="btn btn-secondary btn-sm">
                                 Retour
                             </a>
                             <br />
@@ -40,26 +40,32 @@
                         <div class="card-body px-0 pt-0">
                             <form method="POST" action="" enctype="multipart/form-data">
                                 {{ form.hidden_tag() }}
-                            
+                                
+                                <!-- Bouton pour sélectionner les maux -->
                                 <div class="mb-4">
                                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#mauxModal">
                                         Sélectionner une ou plusieurs maux
                                     </button>
                                 </div>
                             
-                                <!-- Fenêtre modale Maux -->
+                                <!-- Fenêtre modale pour les maux -->
                                 <div class="modal fade" id="mauxModal" tabindex="-1" aria-labelledby="mauxModalLabel" aria-hidden="true">
                                     <div class="modal-dialog">
                                         <div class="modal-content">
                                             <div class="modal-header">
                                                 <h5 class="modal-title" id="mauxModalLabel">Sélectionner les maux concernés</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                                             </div>
                                             <div class="modal-body">
                                                 {% for mal in maux %}
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" value="{{ mal.id }}" id="mal{{ mal.id }}" 
-                                                    {% if mal.id in selected_maux %} checked {% endif %}>
+                                                    <input 
+                                                        class="form-check-input" 
+                                                        type="checkbox" 
+                                                        name="maux" 
+                                                        value="{{ mal.id }}" 
+                                                        id="mal{{ mal.id }}" 
+                                                        {% if mal.id in selected_maux %}checked{% endif %}>
                                                     <label class="form-check-label" for="mal{{ mal.id }}">
                                                         {{ mal.nom_commun }}
                                                     </label>
@@ -67,133 +73,148 @@
                                                 {% endfor %}
                                             </div>
                                             <div class="modal-footer">
-                                                <a href="">Ajouter un nouveaux</a>
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                                                <a href="/add_mal" class="btn btn-link">Ajouter un nouveau</a>
                                                 <button type="button" class="btn btn-primary" id="saveMaux">Enregistrer la sélection</button>
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             
-                                <!-- Champs du formulaire -->
+                                <!-- Section pour les champs du formulaire -->
                                 <div class="mb-4">
                                     <label for="nom">{{ form.nom.label }}</label>
-                                    {{ form.nom(class="form-control", placeholder="Ex. : Gingembre", value=ingredient.nom) }}
+                                    {{ form.nom(class="form-control", placeholder="Ex. : Gingembre", value=remede.nom) }}
                                     {% if form.nom.errors %}
-                                        <span class="text-danger">{{ form.nom.errors[0] }}</span>
+                                    <span class="text-danger">{{ form.nom.errors[0] }}</span>
                                     {% endif %}
                                 </div>
                             
                                 <div class="mb-4">
                                     <label for="description">{{ form.description.label }}</label>
-                                    {{ form.description(class="form-control", placeholder="Nom local en langue Fon", value=ingredient.description) }}
+                                    {{ form.description(class="form-control", placeholder="Description du remède", value=remede.description) }}
                                     {% if form.description.errors %}
-                                        <span class="text-danger">{{ form.description.errors[0] }}</span>
+                                    <span class="text-danger">{{ form.description.errors[0] }}</span>
                                     {% endif %}
                                 </div>
                             
                                 <div class="mb-4">
                                     <label for="preparation">{{ form.preparation.label }}</label>
-                                    {{ form.preparation(class="form-control", placeholder="Nom scientifique de l'ingrédient", value=ingredient.preparation) }}
+                                    {{ form.preparation(class="form-control", placeholder="Ex. : Mode de préparation", value=remede.preparation) }}
                                     {% if form.preparation.errors %}
-                                        <span class="text-danger">{{ form.preparation.errors[0] }}</span>
+                                    <span class="text-danger">{{ form.preparation.errors[0] }}</span>
                                     {% endif %}
                                 </div>
                             
                                 <div class="mb-4">
-                                    <label for="indications">{{ form.indications.label }}</label>
-                                    {{ form.indications(class="form-control", placeholder="Ex. : Racine, Feuille", value=ingredient.indications) }}
-                                    {% if form.indications.errors %}
-                                        <span class="text-danger">{{ form.indications.errors[0] }}</span>
+                                    <label for="dosage">{{ form.posologie.label }}</label>
+                                    {{ form.posologie(class="form-control", placeholder="Ex. : 1 cuillère par jour", value=remede.posologie ) }}
+                                    {% if form.posologie.errors %}
+                                    <span class="text-danger">{{ form.posologie.errors[0] }}</span>
                                     {% endif %}
                                 </div>
                             
-                                <div class="mb-4">
-                                    <label for="dosage">{{ form.dosage.label }}</label>
-                                    {{ form.dosage(class="form-control", placeholder="Propriétés thérapeutiques, nutritives, etc.", value=ingredient.dosage) }}
-                                    {% if form.dosage.errors %}
-                                        <span class="text-danger">{{ form.dosage.errors[0] }}</span>
-                                    {% endif %}
-                                </div>
-                            
-                                <div class="mb-4">
-                                    <label for="precautions">{{ form.precautions.label }}</label>
-                                    {{ form.precautions(class="form-control", placeholder="Précautions à prendre", value=ingredient.precautions) }}
-                                    {% if form.precautions.errors %}
-                                        <span class="text-danger">{{ form.precautions.errors[0] }}</span>
-                                    {% endif %}
-                                </div>
-                            
-                                <div class="mb-4">
-                                    <label for="latitude">{{ form.latitude.label }}</label>
-                                    {{ form.latitude(class="form-control", placeholder="Coordonnée géographique : latitude", value=ingredient.latitude) }}
-                                    {% if form.latitude.errors %}
-                                        <span class="text-danger">{{ form.latitude.errors[0] }}</span>
-                                    {% endif %}
-                                </div>
-                            
-                                <div class="mb-4">
-                                    <label for="longitude">{{ form.longitude.label }}</label>
-                                    {{ form.longitude(class="form-control", placeholder="Coordonnée géographique : longitude", value=ingredient.longitude) }}
-                                    {% if form.longitude.errors %}
-                                        <span class="text-danger">{{ form.longitude.errors[0] }}</span>
-                                    {% endif %}
-                                </div>
-                            
-                                <div class="mb-4">
-                                    <label for="liens">{{ form.liens.label }}</label>
-                                    {{ form.liens(class="form-control", placeholder="Liens utiles, sources, etc.", value=ingredient.liens) }}
-                                    {% if form.liens.errors %}
-                                        <span class="text-danger">{{ form.liens.errors[0] }}</span>
-                                    {% endif %}
-                                </div>
-                            
-                                <!-- Sélection des ingrédients, maux, articles -->
+                                <!-- Bouton pour sélectionner les ingrédients -->
                                 <div class="mb-4">
                                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ingredientsModal">
                                         Sélectionner les ingrédients
                                     </button>
                                 </div>
                             
-                                <!-- Modal Ingrédients -->
+                                <!-- Fenêtre modale pour les ingrédients -->
                                 <div class="modal fade" id="ingredientsModal" tabindex="-1" aria-labelledby="ingredientsModalLabel" aria-hidden="true">
                                     <div class="modal-dialog">
                                         <div class="modal-content">
                                             <div class="modal-header">
                                                 <h5 class="modal-title" id="ingredientsModalLabel">Sélectionner les ingrédients</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                                             </div>
                                             <div class="modal-body">
                                                 {% for ingredient in ingredients %}
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" value="{{ ingredient.id }}" id="ingredient{{ ingredient.id }}" 
-                                                    {% if ingredient.id in selected_ingredients %} checked {% endif %}>
+                                                    <input 
+                                                        class="form-check-input" 
+                                                        type="checkbox" 
+                                                        name="ingredients" 
+                                                        value="{{ ingredient.id }}" 
+                                                        id="ingredient{{ ingredient.id }}" 
+                                                        {% if ingredient.id in selected_ingredients %}checked{% endif %}>
                                                     <label class="form-check-label" for="ingredient{{ ingredient.id }}">
                                                         {{ ingredient.nom_commun }}
                                                     </label>
-                                                    <input type="text" class="form-control mt-2" id="quantity{{ ingredient.id }}" 
-                                                    placeholder="Quantité" value="{{ selected_quantities[ingredient.id] }}">
+                                                    <input 
+                                                        type="text" 
+                                                        class="form-control mt-2" 
+                                                        name="quantite_{{ ingredient.id }}" 
+                                                        placeholder="Quantité (ex. : 2g)" 
+                                                        value="{{ ingredient.quantite }}">
                                                 </div>
                                                 {% endfor %}
                                             </div>
                                             <div class="modal-footer">
-                                                <a href="/add_ingredient">Ajouter un nouveaux</a>
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                                                <a href="/add_ingredient" class="btn btn-link">Ajouter un nouveau</a>
                                                 <button type="button" class="btn btn-primary" id="saveIngredients">Enregistrer la sélection</button>
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             
-                                <!-- Soumettre -->
-                                <div class="d-grid">
-                                    <button type="submit" class="btn rounded btn-secondary">Soumettre</button>
+                                <!-- Champ pour ajouter des images -->
+                                <div class="mb-4">
+                                    <label for="images">{{ form.images.label }}</label>
+                                    {{ form.images(class="form-control", value=remede.images) }}
+                                    {% if form.images.errors %}
+                                    <span class="text-danger">{{ form.images.errors[0] }}</span>
+                                    {% endif %}
                                 </div>
-                            </form>
                             
-                          
+                                <!-- Bouton pour sélectionner les articles -->
+                                <div class="mb-4">
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#articlesModal">
+                                        Sélectionner les articles scientifiques
+                                    </button>
+                                </div>
                             
-                   </div>
+                                <!-- Fenêtre modale pour les articles -->
+                                <div class="modal fade" id="articlesModal" tabindex="-1" aria-labelledby="articlesModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="articlesModalLabel">Sélectionner les articles scientifiques</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                {% for article in articles %}
+                                                <div class="form-check">
+                                                    <input 
+                                                        class="form-check-input" 
+                                                        type="checkbox" 
+                                                        name="articles" 
+                                                        value="{{ article.id }}" 
+                                                        id="article{{ article.id }}" 
+                                                        {% if article.id in selected_articles %}checked{% endif %}>
+                                                    <label class="form-check-label" for="article{{ article.id }}">
+                                                        {{ article.titre }} ({{ article.auteur }}, {{ article.annee }})
+                                                    </label>
+                                                </div>
+                                                {% endfor %}
+                                            </div>
+                                            <div class="modal-footer">
+                                                <a href="/add_article" class="btn btn-link">Ajouter un nouvel article</a>
+                                                <button type="button" class="btn btn-primary" id="saveArticles">Enregistrer la sélection</button>
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            
+                                <!-- Bouton pour soumettre le formulaire -->
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-success">Enregistrer les modifications</button>
+                                </div>
+                            </form>                            
+                        </div>
                     </div>
                     <!-- End of Form Card -->
                 </div>

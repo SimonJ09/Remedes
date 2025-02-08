@@ -1,10 +1,9 @@
 <script>
-
-    
     // Script pour sauvegarder les ingrédients
     document.getElementById("saveIngredients").addEventListener("click", function () {
         const selectedIngredients = [];
-        document.querySelectorAll(".form-check-input:checked").forEach((checkbox) => {
+        // Cible uniquement les cases à cocher dans la section des ingrédients
+        document.querySelectorAll("#ingredientsModal .form-check-input:checked").forEach((checkbox) => {
             const ingredientId = checkbox.value;
             const quantityInput = document.getElementById(`quantity${ingredientId}`);
             const quantity = quantityInput ? quantityInput.value : "";
@@ -26,14 +25,15 @@
     // Script pour sauvegarder les maux
     document.getElementById("saveMaux").addEventListener("click", function () {
         const selectedMaux = [];
-        document.querySelectorAll(".form-check-input:checked").forEach((checkbox) => {
+        // Cible uniquement les cases à cocher dans la section des maux
+        document.querySelectorAll("#mauxModal .form-check-input:checked").forEach((checkbox) => {
             const malId = checkbox.value;
             selectedMaux.push({ id: malId });
         });
 
         console.log("Maux sélectionnés :", selectedMaux);
 
-        const mauxInput = document.createElement("input"); 
+        const mauxInput = document.createElement("input");
         mauxInput.type = "hidden";
         mauxInput.name = "maux";
         mauxInput.value = JSON.stringify(selectedMaux);
@@ -41,14 +41,13 @@
         form.appendChild(mauxInput);
 
         console.log("Formulaire mis à jour :", form);
-
-        
     });
 
     // Script pour sauvegarder les articles
     document.getElementById("saveArticles").addEventListener("click", function () {
         const selectedArticles = [];
-        document.querySelectorAll(".form-check-input:checked").forEach((checkbox) => {
+        // Cible uniquement les cases à cocher dans la section des articles
+        document.querySelectorAll("#articlesModal .form-check-input:checked").forEach((checkbox) => {
             const articleId = checkbox.value;
             selectedArticles.push({ id: articleId });
         });
@@ -63,12 +62,5 @@
         form.appendChild(articlesInput);
 
         console.log("Formulaire mis à jour :", form);
-
-        // Fermer la modale
-        
     });
 </script>
-
-
-
-

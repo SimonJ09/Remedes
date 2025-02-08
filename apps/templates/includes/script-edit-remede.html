@@ -1,51 +1,100 @@
 <script>
+    // Précharger les ingrédients sélectionnés
+    document.addEventListener("DOMContentLoaded", function () {
+        const existingIngredients = JSON.parse('{{ selected_ingredients | tojson | safe }}'); // Charger les ingrédients depuis la base de données
+        existingIngredients.forEach((ingredient) => {
+            const checkbox = document.getElementById(`ingredient${ingredient.id}`);
+            if (checkbox) {
+                checkbox.checked = true;
+                const quantityInput = document.getElementById(`quantity${ingredient.id}`);
+                if (quantityInput) {
+                    quantityInput.value = ingredient.quantity || ""; // Charger la quantité
+                }
+            }
+        });             
+
+        const existingMaux = JSON.parse('{{ selected_maux | tojson | safe }}'); // Charger les maux
+        existingMaux.forEach((mal) => {
+            const checkbox = document.getElementById(`mal${mal.id}`);
+            if (checkbox) {
+                checkbox.checked = true;
+            }
+        });
+
+        const existingArticles = JSON.parse('{{ selected_articles | tojson | safe }}'); // Charger les articles
+        existingArticles.forEach((article) => {
+            const checkbox = document.getElementById(`article${article.id}`);
+            if (checkbox) {
+                checkbox.checked = true;
+            }
+        });
+    });
+
     // Script pour sauvegarder les ingrédients
     document.getElementById("saveIngredients").addEventListener("click", function () {
         const selectedIngredients = [];
-        document.querySelectorAll(".form-check-input:checked").forEach((checkbox) => {
+        document.querySelectorAll("#ingredientsModal .form-check-input:checked").forEach((checkbox) => {
             const ingredientId = checkbox.value;
             const quantityInput = document.getElementById(`quantity${ingredientId}`);
             const quantity = quantityInput ? quantityInput.value : "";
             selectedIngredients.push({ id: ingredientId, quantity });
         });
-    
-        console.log("Ingrédients sélectionnés :", selectedIngredients);
-    
-        const ingredientsInput = document.createElement("input");
-        ingredientsInput.type = "hidden";
-        ingredientsInput.name = "ingredients";
-        ingredientsInput.value = JSON.stringify(selectedIngredients);
-        const form = document.querySelector("form");
-        form.appendChild(ingredientsInput);
-    
-        // Fermer la modale
-        const modal = bootstrap.Modal.getInstance(document.getElementById("ingredientsModal"));
-        if (modal) {
-            modal.hide();
+
+
+        const ingredientsInput = document.querySelector("input[name='ingredients']");
+        if (ingredientsInput) {
+            ingredientsInput.value = JSON.stringify(selectedIngredients);
+        } else {
+            const newIngredientsInput = document.createElement("input");
+            newIngredientsInput.type = "hidden";
+            newIngredientsInput.name = "ingredients";
+            newIngredientsInput.value = JSON.stringify(selectedIngredients);
+            const form = document.querySelector("form");
+            form.appendChild(newIngredientsInput);
         }
     });
-    
+
     // Script pour sauvegarder les maux
     document.getElementById("saveMaux").addEventListener("click", function () {
         const selectedMaux = [];
-        document.querySelectorAll(".form-check-input:checked").forEach((checkbox) => {
+        document.querySelectorAll("#mauxModal .form-check-input:checked").forEach((checkbox) => {
             const malId = checkbox.value;
             selectedMaux.push({ id: malId });
         });
-    
-        console.log("Maux sélectionnés :", selectedMaux);
-    
-        const mauxInput = document.createElement("input");
-        mauxInput.type = "hidden";
-        mauxInput.name = "maux";
-        mauxInput.value = JSON.stringify(selectedMaux);
-        const form = document.querySelector("form");
-        form.appendChild(mauxInput);
-    
-        // Fermer la modale
-        const modal = bootstrap.Modal.getInstance(document.getElementById("mauxModal"));
-        if (modal) {
-            modal.hide();
+
+
+        const mauxInput = document.querySelector("input[name='maux']");
+        if (mauxInput) {
+            mauxInput.value = JSON.stringify(selectedMaux);
+        } else {
+            const newMauxInput = document.createElement("input");
+            newMauxInput.type = "hidden";
+            newMauxInput.name = "maux";
+            newMauxInput.value = JSON.stringify(selectedMaux);
+            const form = document.querySelector("form");
+            form.appendChild(newMauxInput);
         }
     });
-    </script>
+
+    // Script pour sauvegarder les articles
+    document.getElementById("saveArticles").addEventListener("click", function () {
+        const selectedArticles = [];
+        document.querySelectorAll("#articlesModal .form-check-input:checked").forEach((checkbox) => {
+            const articleId = checkbox.value;
+            selectedArticles.push({ id: articleId });
+        });
+
+
+        const articlesInput = document.querySelector("input[name='articles']");
+        if (articlesInput) {
+            articlesInput.value = JSON.stringify(selectedArticles);
+        } else {
+            const newArticlesInput = document.createElement("input");
+            newArticlesInput.type = "hidden";
+            newArticlesInput.name = "articles";
+            newArticlesInput.value = JSON.stringify(selectedArticles);
+            const form = document.querySelector("form");
+            form.appendChild(newArticlesInput);
+        }
+    });
+</script>
