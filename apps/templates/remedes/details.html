@@ -48,8 +48,7 @@
 <body>
     
   {% include 'includes/navigation.html' %}
-    {% include 'includes/style_menu.html' %}
-    
+    {% include 'includes/style_menu.html' %}  
 
     <main>
 
@@ -166,37 +165,7 @@
                 <div class="mb-4">
                     <h4 class="h6 font-weight-bold"></h4>
                 </div>
-                <nav aria-label="Blog page navigation">
-                  <ul class="pagination">
-                    {% if page > 1 %}
-                    <li class="page-item">
-                        <a class="page-link" href="{{ url_for('remedes_blueprint.remedes', page=1) }}" aria-label="First">
-                            <span class="fas fa-angle-double-left"></span>
-                        </a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="{{ url_for('remedes_blueprint.remedes', page=page-1) }}">Précédent</a>
-                    </li>
-                    {% endif %}
-                
-                    {% for i in range(1, total_pages + 1) %}
-                    <li class="page-item {% if i == page %}active{% endif %}">
-                        <a class="page-link" href="{{ url_for('remedes_blueprint.remedes', page=i) }}">{{ i }}</a>
-                    </li>
-                    {% endfor %}
-                
-                    {% if page < total_pages %}
-                    <li class="page-item">
-                        <a class="page-link" href="{{ url_for('remedes_blueprint.remedes', page=page+1) }}">Suivant</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="{{ url_for('remedes_blueprint.remedes', page=total_pages) }}" aria-label="Last">
-                            <span class="fas fa-angle-double-right"></span>
-                        </a>
-                    </li>
-                    {% endif %}
-                </ul>                
-                </nav>
+              
               </div>
           </div>
         </div>
@@ -207,6 +176,6 @@
 
     {% include 'includes/scripts.html' %}
 
-    {% include 'includes/scripts-menu.html' %}
+    {% include 'includes/scripts-details.html' %}
 </body>
 </html>

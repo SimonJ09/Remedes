@@ -91,75 +91,19 @@
               {% for remede in resultats %}
               <div class="remede-card">
                   <!-- Gestion des images -->
-                  <img src="{{ url_for('static', filename='uploads/' + remede.images.replace('\\', '/')) if remede.images else url_for('static', filename='assets/img/blog/image-1.jpg') }}" alt="Image de remède" />
                   <div class="commentaire-text">
                       <div class="remede-content">
-                          <h3>{{ remede.nom}}</h3>
+                        <a href="{{ url_for('remedes_blueprint.details', remede_id=remede.id, mot_cle = mot_cle) }}"><h3>{{ remede.nom}}</h3></a>
                           <p>
                               Description : {{ remede.description or 'Non spécifiée' }}<br />
                               Indications : {{ remede.indications or 'Non spécifiées' }}<br />
                               Dosage : {{ remede.dosage or 'Non spécifié' }}
                           </p>
                       </div>
-          
-                      <!-- Ingrédients -->
-                      {% if remede.ingredients %}
-                      <div class="ingredients-section">
-                          <h4>Ingrédients :</h4>
-                          <ul>
-                              {% for ingredient in remede.ingredients %}
-                              <li>{{ ingredient.nom_commun }} - {{ ingredient.quantite }}</li>
-                              {% endfor %}
-                          </ul>
-                      </div>
-                      {% endif %}
-          
-                      <!-- Maladies associées -->
-                      {% if remede.maladies %}
-                      <div class="maladies-section">
-                          <h4>Maladies associées :</h4>
-                          <ul>
-                              {% for maladie in remede.maladies %}
-                              <li>{{ maladie.nom_commun }}</li>
-                              {% endfor %}
-                          </ul>
-                      </div>
-                      {% endif %}
-          
-                      <!-- Articles scientifiques associés -->
-                      {% if remede.articles %}
-                      <div class="articles-section">
-                          <h4>Articles scientifiques associés :</h4>
-                          <ul>
-                              {% for article in remede.articles %}
-                              <li><a href="{{ article.lien }}" target="_blank">{{ article.titre }}</a></li>
-                              {% endfor %}
-                          </ul>
-                      </div>
-                      {% endif %}
-                      {% if remede.liens %}
-                      <a href="{{ remede.liens }}" target="_blank" rel="noopener noreferrer">En savoir plus</a>
-                      {% endif %}
-                        <!-- Boutons "J'aime", "Commentaire" et "Partager" -->
-                        <!-- Section des commentaires -->
-                        <div class="comments-section" id="comments-{{ loop.index }}" style="display:none;">
-                            {% if remede.commentaires %}
-                                {% for commentaire in remede.commentaires %}
-                                <div class="comment">
-                                    <p><strong>{{ commentaire.username }} :</strong> {{ commentaire.comment }}</p>
-                                </div>
-                                {% endfor %}
-                            {% else %}
-                                <p>Aucun commentaire pour le moment.</p>
-                            {% endif %}
-                          
-                        </div>
-                  </div>
               </div>
               {% endfor %}
           </div>
-          
-          
+    
               <div class="col-md-6">
                 <br>
                 <div class="mb-4">

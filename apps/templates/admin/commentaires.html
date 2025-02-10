@@ -1,0 +1,127 @@
+{% extends "layouts/base-admin.html" %}
+
+{% block title %} Tables {% endblock %} 
+
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <main>
+        <div class="container-fluid px-4">
+            <h1 class="mt-4">Tables</h1>
+            <ol class="breadcrumb mb-4">
+                <li class="breadcrumb-item"><a href="admin">Dashboard</a></li>
+                <li class="breadcrumb-item active">Tables des commentaires</li>
+            </ol>
+            <div class="card mb-4">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+                {% endwith %}
+                <div class="card-body">
+
+                </div>
+            </div>
+            <div class="card mb-4">
+                <div class="card-header">
+                    <li>
+                        <i class="fas fa-table me-1"></i>
+                         DataTable 
+                    </li>
+                </div>
+                <div class="table-responsive" class="card-body">
+                    <div class="mb-3">
+                        <label for="bulkActions" class="form-label">Actions en masse</label>
+                        <select id="bulkActions" class="form-select">
+                            <option value="">Choisir une action...</option>
+                            <option value="delete">Supprimer les commentaires sélectionnés</option>
+                            <option value="activate">Activer admin pour sélectionnés</option>
+                            <option value="deactivate">Désactiver admin pour les sélectionnés</option>
+                        </select>
+                        <button id="applyAction" class="btn btn-primary mt-2" disabled>Appliquer l'action</button>
+                    </div>
+                    <table class="table" id="datatablesSimple">
+                        <thead>
+                            <tr>
+                                <tr>
+                                    <th></th>
+                                    <th>Comments</th>
+                                    <th>Remedes</th>
+                                    <th>Utilisateurs</th>
+                                    <th>Date Ajout </th>                            
+                                    <th>Dte mise a jour</th>
+                                    <th>Action</th>
+                                </tr>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th></th>
+                                <th>Comments</th>
+                                <th>Remedes</th>
+                                <th>Utilisateurs</th>
+                                <th>Date Ajout </th>                            
+                                <th>Date mise a jour</th>
+                                <th>Action</th>
+                            </tr>
+                        </tfoot>
+                        <tbody>
+                            <tr>
+                                <th>
+                                    <input type="checkbox" id="selectAll" class="form-check-input">
+                                </th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                            {% for comment in comments %}
+                            <tr>
+                                <td>
+                                    <div class="form-check">
+                                        <input class="form-check-input selectItem" type="checkbox" value="{{ user.id }}" id="checkbox{{ user.id }}">
+                                    </div> 
+                                </td>
+                                <td>{{ comment.comment }}</td>
+                                <td>{{ comment.remede.nom }}</td>
+                                <td>{{ comment.user.username }}</td>
+                                <td>{{ comment.user.date_ajout }}</td>
+                                <td>{{ comment.user.date_mise_a_jour}}</td>                              
+                                <td class="d-flex">
+                                    <!-- Lien vers la page d'édition -->
+                                    <a href="{{ url_for('admin_blueprint.edit_comment', remede_id=remede.id) }}" class="btn btn-warning btn-sm mr-2">
+                                        <i class="fas fa-edit"></i> 
+                                    </a>
+                                
+                                    <!-- Lien vers la page de suppression -->
+                                    <a href="{{ url_for('admin_blueprint.delete_comment', id=remede.id) }}" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette remèdes ?');">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+           
+        </div>
+
+       
+    </main>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+{% include 'includes/scripts-comment-admin.html' %}
+{% include 'includes/scripts-admin.html' %}
+    
+{% endblock javascripts %}

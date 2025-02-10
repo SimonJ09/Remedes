@@ -26,7 +26,7 @@ from flask_login import (
     login_user,
     logout_user
 )
-from apps.remedes.util import recherche_mot_cle , get_remedes_data
+from apps.remedes.util import recherche_mot_cle , get_remedes_data, get_remede_par_id
 from sqlalchemy.orm import aliased
 from sqlalchemy import or_
 
@@ -95,11 +95,6 @@ def remedes():
         total_remedes = len(resultats)
         total_pages = (total_remedes // per_page) + (1 if total_remedes % per_page > 0 else 0)
         resultats_pagination = resultats[(page - 1) * per_page:page * per_page]
-
-        # Debugging pour vérifier les données
-        print(f"Mot clé : {mot_cle}")
-        print(f"Résultats trouvés ({len(resultats)}): {resultats_pagination}")
-
         # Passer les résultats au template
         return render_template(
             'remedes/menu.html',
@@ -124,6 +119,30 @@ def remedes():
         )
 
 
+
+@blueprint.route('/details/<int:remede_id>', methods=['GET', 'POST'])
+@login_required
+def details(remede_id):
+    is_admin = current_user.is_admin  # Détermine si l'utilisateur est un admin
+    remedes = [
+    ]
+    mot_cle = request.args.get('mot_cle', "")
+    # Gérer la méthode POST pour récupérer les détails du remède
+    if request.method == 'POST':
+        mot_cle = request.args.get('mot_cle', "")
+        # Appeler la fonction avec la liste de remèdes et l'ID
+        resultats = get_remede_par_id(remedes, remede_id)
+        # Renvoyer les résultats à un modèle HTML
+        return render_template(
+            'remedes/details.html',
+            resultats=resultats,
+            is_admin=is_admin
+        )
+    return render_template(
+        'remedes/details.html',
+        resultats={"erreur": "Veuillez soumettre un formulaire pour voir les détails."},
+        is_admin=is_admin, mot_cle = mot_cle 
+    )
 
 
 

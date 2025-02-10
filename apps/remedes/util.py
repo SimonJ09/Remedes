@@ -160,3 +160,50 @@ def get_remedes_data(remedes):
     return remedes_data
 
 
+def get_remede_par_id(remede_id):
+    # Rechercher le remède correspondant à l'ID (exemple avec un ORM comme Django)
+    try:
+        remede = Remede.objects.get(id=remede_id)  # Recherche dans la base de données
+    except Remede.DoesNotExist:
+        return {"erreur": f"Aucun remède trouvé avec l'ID {remede_id}"}
+
+    # Construire les informations du remède
+    
+    remede_info = {
+        "id": remede.id,
+        "nom": remede.nom,
+        "description": remede.description,
+        "indications": remede.indications,
+        "posologie": remede.posologie,
+        "liens": remede.liens,
+        "ingredients": [
+            {
+                "nom_commun": ri.ingredient.nom_commun,
+                "quantite": ri.quantite
+            } for ri in remede.ingredients.all()
+        ],
+        "maladies": [
+            {
+                "nom_commun": rm.maladie.nom_commun
+            } for rm in remede.maladie.all()
+        ],
+        "articles": [
+            {
+                "titre": article.titre,
+                "lien": article.lien
+            } for article in remede.articles.all()
+        ],
+        "commentaires": [
+            {
+                "user_id": commentaire.user_id if commentaire.user_id else "Utilisateur inconnu",
+                "username": commentaire.user.username if commentaire.user else "Utilisateur inconnu",
+                "comment": commentaire.comment,
+                "date": commentaire.date_ajout
+            } for commentaire in remede.commentaires.all()
+        ],
+        "likes": remede.nombre_likes,  # Nombre de likes
+        "partages": remede.nombre_partages  # Nombre de partages
+    }
+    return remede_info
+
+
