@@ -40,14 +40,16 @@
                                 <div class="row g-0">
                                     <div class="col-lg-6 bg-dark d-none d-lg-block me-0 me-3">
                                         <div class="px-0 py-3 text-center">
-                                            <img src="/static/assets/img/megamenu_image.png" alt="Pixel Components">
+                                            <img src="/static/assetspages/img/carousel-1.jpg" alt="Pixel Components">
                                         </div>
                                     </div>
                                     <div class="col ps-0 py-3">
                                         <ul class="list-style-none">
-                                            <li><a class="dropdown-item" href="/ui-accordions.html">Blog</a></li>
-                                            <li><a class="dropdown-item" href="/ui-alerts.html">Testimonial</a></li>
-                                            <li><a class="dropdown-item" href="/ui-badges.html">Articles</a></li>
+                                            <li><a class="dropdown-item" href="/service">Services</a></li>
+                                            <li><a class="dropdown-item" href="/project">Project</a></li>
+                                            <li><a class="dropdown-item" href="/feature">Caractéristiques</a></li>
+                                            <li><a class="dropdown-item" href="/team">Notre équipe</a></li>
+                                            <li><a class="dropdown-item" href="/testmonial">Testimonial</a></li>
                                         </ul>
                                     </div>
                                 </div>
@@ -103,6 +105,7 @@
                                     {% endif %}
                                 </li>
                                 <li><hr class="dropdown-divider" /></li>
+                                <li><a class="dropdown-item" href="{{ url_for('authentication_blueprint.profil') }}">Profil</a></li>
                                 <li><a class="dropdown-item" href="{{ url_for('authentication_blueprint.logout') }}">Logout</a></li>
                             </ul>
                         </div>
@@ -111,7 +114,7 @@
                         <a href="{{ url_for('authentication_blueprint.login') }}" class="btn btn-outline-gray-100 d-none d-lg-inline me-md-3">
                             <span class="fas fa-sign-out-alt me-2"></span>Login / Sign in
                         </a>
-                        <a href="{{ url_for('authentication_blueprint.login') }}" target="_blank" class="btn btn-tertiary">
+                        <a href="{{ url_for('authentication_blueprint.login') }}"  class="btn btn-tertiary">
                             <i class="fas fa-play me-2"></i>Start
                         </a>
                     {% endif %}

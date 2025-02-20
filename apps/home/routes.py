@@ -12,6 +12,32 @@ from jinja2 import TemplateNotFound
 def home():
     return render_template('home/index.html', segment='index')
 
+@blueprint.route('/service')
+#@login_required
+def service():
+    return render_template('home/service.html', segment='index')
+
+@blueprint.route('/project')
+#@login_required
+def project():
+    return render_template('home/project.html', segment='index')
+
+@blueprint.route('/feature')
+#@login_required
+def feature():
+    return render_template('home/feature.html', segment='index')
+
+@blueprint.route('/team')
+#@login_required
+def team():
+    return render_template('home/team.html', segment='index')
+
+@blueprint.route('/testmonial')
+#@login_required
+def testmonial():
+    return render_template('home/testmonial.html', segment='index')
+
+                                        
 
 @blueprint.route('/about')
 #@login_required

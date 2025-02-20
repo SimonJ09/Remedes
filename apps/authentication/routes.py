@@ -13,7 +13,7 @@ from apps.authentication import blueprint
 from apps.authentication.forms import LoginForm, CreateAccountForm
 from apps.authentication.models import Users
 from datetime import date
-from apps.authentication.util import verify_pass
+from apps.authentication.util import verify_pass, hash_pass
 
 
 
@@ -53,7 +53,6 @@ def register():
         username = request.form['username']
         email = request.form['email']
         
-
         # Check usename exists
         user = Users.query.filter_by(username=username).first()
         if user:
@@ -82,6 +81,35 @@ def register():
 
     else:
         return render_template('accounts/register.html', form=create_account_form)
+
+
+
+@blueprint.route('/password')
+def password():
+    return render_template('accounts/password.html')
+
+from flask_login import login_required
+from flask import request, redirect, url_for, render_template, flash
+
+@blueprint.route('/profil', methods=['GET', 'POST'])
+@login_required
+def profil():
+    if request.method == 'POST':
+        # Mise à jour des informations de l'utilisateur
+        current_user.username = request.form['username']
+        current_user.email = request.form['email']
+        
+        # Gestion du mot de passe si l'utilisateur souhaite le changer
+        password = request.form['password']
+        if password:  # Si le mot de passe est renseigné
+            current_user.password = hash_pass(password)  # Hachage du nouveau mot de passe
+
+        db.session.commit()
+        return redirect(url_for('authentication_blueprint.profil'))  # Redirection après la mise à jour
+
+    # Affichage du profil de l'utilisateur
+    return render_template('accounts/profil.html', user=current_user)
+
 
 
 @blueprint.route('/logout')

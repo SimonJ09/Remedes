@@ -215,6 +215,8 @@ class Users(db.Model, UserMixin):
     def __repr__(self):
         return f"<User {self.username}, Admin: {self.is_admin}>"
 
+
+
 @login_manager.user_loader
 def user_loader(id):
     return Users.query.filter_by(id=id).first()

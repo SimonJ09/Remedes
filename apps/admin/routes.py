@@ -51,6 +51,17 @@ def comment():
 
 
 
+@blueprint.route('/map', methods=['GET','POST'])
+@login_required
+def map():
+    users = Users.query.all()
+    if not current_user.is_admin:
+       return render_template('home/page-500.html'), 500 
+    return render_template('admin/map.html', segment='index', users = users )
+
+
+
+
 
 
 @blueprint.route('/add_comment', methods=['GET', 'POST'])

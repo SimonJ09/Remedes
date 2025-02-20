@@ -75,7 +75,6 @@ class MaladieForm(FlaskForm):
     submit = SubmitField('Enregistrer')
 
 
-
 from wtforms import StringField, TextAreaField, DateField, SubmitField, SelectMultipleField
 from wtforms.validators import URL
 
