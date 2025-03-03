@@ -6,12 +6,8 @@
 {% block stylesheets %}{% endblock stylesheets %}
 
 {% block content %}
-
     <main>
-
         {% include 'includes/preloader.html' %}
-
-        
         <!-- Section -->
         <section class="min-vh-100 d-flex align-items-center section-image overlay-soft-dark" data-background="/static/assets/img/pages/form-image.jpg">
             <div class="container">
@@ -20,7 +16,10 @@
                         <div class="signin-inner my-4 my-lg-0 bg-white shadow-soft border rounded border-gray-300 p-4 p-lg-5 w-100 fmxw-500">
                             <div class="text-center text-md-center mb-4 mt-md-0">
                                 <h1 class="mb-0 h3">
-                                    <a href="/" target="_blank">IIVaGRN</a> - Login
+                                    <a href="/" target="_blank" class="flex items-center gap-2 text-lg font-semibold">
+                                        IIVaGRN - Login
+                                        <img src="{{ url_for('static', filename='assets/img/brand/logo5.jpg') }}" alt="Logo" class="w-4 h-4" style="width: 100px; height: 100px;">
+                                    </a>
                                 </h1>
                                 <br />
                                 <span class="font-weight-normal">

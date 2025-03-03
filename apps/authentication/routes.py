@@ -16,8 +16,6 @@ from datetime import date
 from apps.authentication.util import verify_pass, hash_pass
 
 
-
-
 # Login & Registration
 
 @blueprint.route('/login', methods=['GET', 'POST'])

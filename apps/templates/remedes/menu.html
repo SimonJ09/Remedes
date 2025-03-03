@@ -62,6 +62,7 @@
             </div>
             <figure class="position-absolute bottom-0 left-0 w-100 d-none d-md-block mb-n2"></figure>
         </section>
+
         <div class="section py-0">
             <div class="container mt-n10 mt-lg-n12 z-2">
                 <div class="row justify-content-center">
@@ -75,74 +76,114 @@
                 </div>
             </div>
         </section>
+
         <!--End of Title section-->
         <div class="section section-md">
-          <div class="container">
-            <!-- Barre de recherche -->
-            <form  method="post" action="{{ url_for('remedes_blueprint.remedes') }}">
-              <div class="search-bar">
-                <input type="text" id="searchInput" name="mot_cle" placeholder="Recherchez un remède ou un ingrédient..." value="{{ mot_cle }}" style="text-align: center; font-size: 1.5em;" />
-                <button>Rechercher</button>
-              </div>
-             </form>
-            <!-- Liste des remèdes -->
-            <div class="remedes-list">
-              <!-- Boucle sur les résultats -->
-              {% for remede in resultats %}
-              <div class="remede-card">
-                  <!-- Gestion des images -->
-                  <div class="commentaire-text">
-                      <div class="remede-content">
-                        <a href="{{ url_for('remedes_blueprint.details', remede_id=remede.id, mot_cle = mot_cle) }}"><h3>{{ remede.nom}}</h3></a>
-                          <p>
-                              Description : {{ remede.description or 'Non spécifiée' }}<br />
-                              Indications : {{ remede.indications or 'Non spécifiées' }}<br />
-                              Dosage : {{ remede.dosage or 'Non spécifié' }}
-                          </p>
-                      </div>
-              </div>
-              {% endfor %}
-          </div>
-    
-              <div class="col-md-6">
-                <br>
-                <div class="mb-4">
-                    <h4 class="h6 font-weight-bold"></h4>
+            <div class="container">
+                <!-- Barre de recherche -->
+                <form method="post" action="{{ url_for('remedes_blueprint.remedes') }}" style="display: flex; justify-content: center; margin-bottom: 20px;">
+                    <div class="search-bar" style="display: flex; align-items: center; width: 100%; max-width: 600px; background: white; border-radius: 25px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); overflow: hidden;">
+                      <input type="text" id="searchInput" name="mot_cle" placeholder="Recherchez un remède ou un ingrédient..." value="{{ mot_cle }}" 
+                        style="flex: 1; border: none; padding: 12px 20px; font-size: 1.2em; font-family: 'Poppins', sans-serif; outline: none;" />
+                      <button style="background-color: #0d1479; color: white; border: none; padding: 12px 20px; font-size: 1.2em; cursor: pointer;">🔍</button>
+                    </div>
+                  </form>
+
+                <div class="row">
+                    <!-- Liste des catégories -->
+                    <div class="categories col-md-3">
+                        <h4>Catégories</h4>
+                        <ul>
+                            <li><a href="#">Catégorie 1</a></li>
+                            <li><a href="#">Catégorie 2</a></li>
+                            <li><a href="#">Catégorie 3</a></li>
+                            <li><a href="#">Catégorie 4</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Liste des remèdes -->
+                    <div class="remedes-list col-md-9">
+                        {% for remede in resultats %}
+                        <div class="remede-item">
+                            <h3>
+                                <a href="{{ url_for('remedes_blueprint.details', remede_id=remede.id, mot_cle=mot_cle) }}" 
+                                    class="remede-title">
+                                    {{ remede.nom }}
+                                </a>
+                            </h3>
+                            <p class="remede-description">{{ remede.description or 'Description non spécifiée' }}</p>
+                            <p class="remede-details">
+                                <span><strong>Indications :</strong> {{ remede.indications or 'Non spécifiées' }}</span> &middot;
+                                <span><strong>Dosage :</strong> {{ remede.dosage or 'Non spécifié' }}</span>
+                            </p>
+                            <p class="remede-links">
+                                {% if remede.pdf_url %}
+                                    <a href="{{ remede.pdf_url }}" class="pdf-link" target="_blank">[PDF]</a>
+                                {% endif %}
+                                <a href="{{ url_for('remedes_blueprint.details', remede_id=remede.id) }}" class="other-versions">Autres versions</a>
+                                <a href="">J'aime</a>
+                                <a href="">Partager</a>
+                                <a href="">Vues</a>
+                            </p>
+                        </div>
+                        {% endfor %}
+                    </div>
                 </div>
-                <nav aria-label="Blog page navigation">
-                  <ul class="pagination">
-                    {% if page > 1 %}
-                    <li class="page-item">
-                        <a class="page-link" href="{{ url_for('remedes_blueprint.remedes', page=1) }}" aria-label="First">
-                            <span class="fas fa-angle-double-left"></span>
-                        </a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="{{ url_for('remedes_blueprint.remedes', page=page-1) }}">Précédent</a>
-                    </li>
-                    {% endif %}
-                
-                    {% for i in range(1, total_pages + 1) %}
-                    <li class="page-item {% if i == page %}active{% endif %}">
-                        <a class="page-link" href="{{ url_for('remedes_blueprint.remedes', page=i) }}">{{ i }}</a>
-                    </li>
-                    {% endfor %}
-                
-                    {% if page < total_pages %}
-                    <li class="page-item">
-                        <a class="page-link" href="{{ url_for('remedes_blueprint.remedes', page=page+1) }}">Suivant</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="{{ url_for('remedes_blueprint.remedes', page=total_pages) }}" aria-label="Last">
-                            <span class="fas fa-angle-double-right"></span>
-                        </a>
-                    </li>
-                    {% endif %}
-                </ul>                
+
+                <!-- Pagination -->
+                {% if total_pages > 1 %}
+                <nav class="pagination-container">
+                    <ul class="pagination">
+                        {% if page > 1 %}
+                        <li><a href="{{ url_for('remedes_blueprint.remedes', page=1) }}">&laquo; Premier</a></li>
+                        <li><a href="{{ url_for('remedes_blueprint.remedes', page=page-1) }}">Précédent</a></li>
+                        {% endif %}
+                        
+                        {% for i in range(1, total_pages + 1) %}
+                        <li class="{% if i == page %}active{% endif %}">
+                            <a href="{{ url_for('remedes_blueprint.remedes', page=i) }}">{{ i }}</a>
+                        </li>
+                        {% endfor %}
+                        
+                        {% if page < total_pages %}
+                        <li><a href="{{ url_for('remedes_blueprint.remedes', page=page+1) }}">Suivant</a></li>
+                        <li><a href="{{ url_for('remedes_blueprint.remedes', page=total_pages) }}">Dernier &raquo;</a></li>
+                        {% endif %}
+                    </ul>
                 </nav>
-              </div>
-          </div>
+                {% endif %}
+            </div>
         </div>
+
+        <style>
+            .remedes-list { max-width: 800px; margin: auto; }
+            .remede-item { margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #ddd; text-align: justify; }
+            .remede-title { color: #1a0dab; font-size: 1.1em; text-decoration: none; }
+            .remede-title:hover { text-decoration: underline; }
+            .remede-description { font-size: 1em; color: #555; }
+            .remede-details { font-size: 0.9em; color: #777; }
+            .remede-links a { font-size: 0.9em; color: #1a0dab; text-decoration: none; margin-right: 10px; }
+            .remede-links a:hover { text-decoration: underline; }
+            .pagination-container { text-align: center; margin-top: 20px; }
+            .pagination { display: inline-block; padding: 0; margin: 0; }
+            .pagination li { display: inline; margin: 0 5px; }
+            .pagination a { text-decoration: none; color: #1a0dab; padding: 5px 10px; border: 1px solid #ddd; }
+            .pagination .active a { font-weight: bold; color: white; background: #1a0dab; }
+
+            /* Style des catégories */
+            .categories {
+                padding: 20px;
+                background-color: #f8f8f8;
+                border-right: 1px solid #ddd;
+            }
+            .categories h4 { font-size: 1.2em; margin-bottom: 15px; }
+            .categories ul { list-style-type: none; padding: 0; }
+            .categories li { margin-bottom: 10px; }
+            .categories li a { text-decoration: none; color: #333; font-size: 1em; }
+            .categories li a:hover { color: #1a0dab; }
+
+        </style>
+
         
 
         

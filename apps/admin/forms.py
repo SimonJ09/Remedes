@@ -20,7 +20,6 @@ class IngredientForm(FlaskForm):
     images = FileField('Image (Chemin ou URL)', validators=[Optional(), FileAllowed(['jpg', 'png', 'jpeg'], 'Seules les images au format JPG, PNG ou JPEG sont autorisées')])
     like = IntegerField('Nombre de Likes', validators=[Optional()])
     user_id = IntegerField('ID Utilisateur', validators=[Optional()])
-
     # Bouton de soumission
     submit = SubmitField('Enregistrer')
 
@@ -37,11 +36,10 @@ class RemedeForm(FlaskForm):
     precautions = TextAreaField('Précautions', validators=[Optional()])
     images = FileField('Image', validators=[Optional(), FileAllowed(['jpg', 'png', 'jpeg'], 'Seules les images au format JPG, PNG ou JPEG sont autorisées')])
     video = FileField('Vidéo', validators=[Optional(), FileAllowed(['mp4', 'avi'], 'Seules les vidéos au format MP4 ou AVI sont autorisées')])
+    pdf = FileField('PDF', validators=[Optional(), FileAllowed(['pdf'], 'Seuls les fichiers PDF sont autorisés')])
     liens = StringField('Liens Utiles', validators=[Optional()])
-
     # Bouton de soumission
     submit = SubmitField('Enregistrer')
-
     def __init__(self, remede=None, *args, **kwargs):
         super(RemedeForm, self).__init__(*args, **kwargs)
         if remede:
@@ -54,8 +52,7 @@ class RemedeForm(FlaskForm):
             self.dosage.data = remede.dosage
             self.precautions.data = remede.precautions
             self.liens.data = remede.liens
-
-
+            
 class MaladieForm(FlaskForm):
     nom_commun = StringField(
         'Nom Commun', 
@@ -77,7 +74,6 @@ class MaladieForm(FlaskForm):
 
 from wtforms import StringField, TextAreaField, DateField, SubmitField, SelectMultipleField
 from wtforms.validators import URL
-
 class ArticleForm(FlaskForm):
     titre = StringField(
         'Titre',

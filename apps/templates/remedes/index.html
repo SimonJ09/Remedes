@@ -71,32 +71,15 @@
                         <!-- Button Modal -->
                         
                         <!-- Form -->
-                        <form class="d-flex justify-content-center align-items-center mb-10" method="post" action="{{ url_for('remedes_blueprint.remedes') }}">
-                            <div class="col-10 text-center">
-                                <label for="searchInput"></label>
-                                <div class="input-group">
-                                    <input 
-                                        type="text" 
-                                        class="form-control" 
-                                        id="searchInput" 
-                                        name="mot_cle" 
-                                        placeholder="Recherchez un remède"
-                                        style="text-align: center; font-size: 1.5em;"
-                                        aria-label="Search" 
-                                        aria-describedby="basic-addon2" 
-                                        value=""
-                                        required
-                                        >
-                                        
-                                    <button type="submit" class="btn btn-primary">
-                                        <span class="input-group-text" id="basic-addon2">
-                                            <span class="fas fa-search"></span>
-                                        </span>
-                                    </button>
-                                </div>
-                            </div>        
-                        </form>
-                        
+                        <form method="post" action="{{ url_for('remedes_blueprint.remedes') }}" style="display: flex; justify-content: center; margin-bottom: 20px;">
+                            <div class="search-bar" style="display: flex; align-items: center; width: 100%; max-width: 600px; background: white; border-radius: 25px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); overflow: hidden;">
+                              <input type="text" id="searchInput" name="mot_cle" placeholder="Recherchez un remède ou un ingrédient..." value="{{ mot_cle }}" 
+                                style="flex: 1; border: none; padding: 12px 20px; font-size: 1.2em; font-family: 'Poppins', sans-serif; outline: none;" />
+                              <button style="background-color: #0d1479; color: white; border: none; padding: 12px 20px; font-size: 1.2em; cursor: pointer;">🔍</button>
+                            </div>
+                          </form>
+
+                       
                         <!-- End of Form -->
                       
                     </div>

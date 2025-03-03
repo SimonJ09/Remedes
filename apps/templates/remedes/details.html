@@ -74,104 +74,66 @@
                 </div>
             </div>
         </section>
-        <!--End of Title section-->
-        <div class="section section-md">
-          <div class="container">
-            <!-- Barre de recherche -->
-            <form  method="post" action="{{ url_for('remedes_blueprint.remedes') }}">
-              <div class="search-bar">
-                <input type="text" id="searchInput" name="mot_cle" placeholder="Recherchez un remède ou un ingrédient..." value="{{ mot_cle }}" style="text-align: center; font-size: 1.5em;" />
-                <button>Rechercher</button>
-              </div>
-             </form>
-            <!-- Liste des remèdes -->
-            <div class="remedes-list">
-              <!-- Boucle sur les résultats -->
-              {% for remede in resultats %}
-              <div class="remede-card">
-                  <!-- Gestion des images -->
-                  <img src="{{ url_for('static', filename='uploads/' + remede.images.replace('\\', '/')) if remede.images else url_for('static', filename='assets/img/blog/image-1.jpg') }}" alt="Image de remède" />
-                  <div class="commentaire-text">
-                      <div class="remede-content">
-                          <h3>{{ remede.nom}}</h3>
-                          <p>
-                              Description : {{ remede.description or 'Non spécifiée' }}<br />
-                              Indications : {{ remede.indications or 'Non spécifiées' }}<br />
-                              Dosage : {{ remede.dosage or 'Non spécifié' }}
-                          </p>
-                      </div>
-          
-                      <!-- Ingrédients -->
-                      {% if remede.ingredients %}
-                      <div class="ingredients-section">
-                          <h4>Ingrédients :</h4>
-                          <ul>
-                              {% for ingredient in remede.ingredients %}
-                              <li>{{ ingredient.nom_commun }} - {{ ingredient.quantite }}</li>
-                              {% endfor %}
-                          </ul>
-                      </div>
-                      {% endif %}
-          
-                      <!-- Maladies associées -->
-                      {% if remede.maladies %}
-                      <div class="maladies-section">
-                          <h4>Maladies associées :</h4>
-                          <ul>
-                              {% for maladie in remede.maladies %}
-                              <li>{{ maladie.nom_commun }}</li>
-                              {% endfor %}
-                          </ul>
-                      </div>
-                      {% endif %}
-          
-                      <!-- Articles scientifiques associés -->
-                      {% if remede.articles %}
-                      <div class="articles-section">
-                          <h4>Articles scientifiques associés :</h4>
-                          <ul>
-                              {% for article in remede.articles %}
-                              <li><a href="{{ article.lien }}" target="_blank">{{ article.titre }}</a></li>
-                              {% endfor %}
-                          </ul>
-                      </div>
-                      {% endif %}
-                      {% if remede.liens %}
-                      <a href="{{ remede.liens }}" target="_blank" rel="noopener noreferrer">En savoir plus</a>
-                      {% endif %}
-                        <!-- Boutons "J'aime", "Commentaire" et "Partager" -->
-                  
-                        <!-- Section des commentaires -->
-                        <div class="comments-section" id="comments-{{ loop.index }}" style="display:none;">
-                            {% if remede.commentaires %}
-                                {% for commentaire in remede.commentaires %}
-                                <div class="comment">
-                                    <p><strong>{{ commentaire.username }} :</strong> {{ commentaire.comment }}</p>
-                                </div>
-                                {% endfor %}
-                            {% else %}
-                                <p>Aucun commentaire pour le moment.</p>
-                            {% endif %}
-                                                     
-                        </div>
-                  </div>
-              </div>
-              {% endfor %}
-          </div>
-          
-          
-              <div class="col-md-6">
-                <br>
-                <div class="mb-4">
-                    <h4 class="h6 font-weight-bold"></h4>
+        <div class="section section-md" style="font-family: 'Poppins', sans-serif; color: #333;">
+            <div class="container">
+              <!-- Barre de recherche améliorée -->
+              <form method="post" action="{{ url_for('remedes_blueprint.remedes') }}" style="display: flex; justify-content: center; margin-bottom: 20px;">
+                <div class="search-bar" style="display: flex; align-items: center; width: 100%; max-width: 600px; background: white; border-radius: 25px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); overflow: hidden;">
+                  <input type="text" id="searchInput" name="mot_cle" placeholder="Recherchez un remède ou un ingrédient..." value="{{ mot_cle }}" 
+                    style="flex: 1; border: none; padding: 12px 20px; font-size: 1.2em; font-family: 'Poppins', sans-serif; outline: none;" />
+                  <button style="background-color: #0d1479; color: white; border: none; padding: 12px 20px; font-size: 1.2em; cursor: pointer;">🔍</button>
                 </div>
+              </form>
               
+              <!-- Liste des remèdes -->
+              <div class="remedes-list" style="display: flex; flex-wrap: wrap; gap: 20px;">
+                {% for remede in resultats %}
+                <div class="remede-card" style="padding: 20px; border: none; box-shadow: none; background: transparent;">
+                  <div class="remede-image" style="text-align: center; margin-bottom: 10px;">
+                    <img src="{{ url_for('static', filename='uploads/' + remede.images.replace('\\', '/')) if remede.images else url_for('static', filename='assets/img/blog/image-1.jpg') }}" alt="Image de remède" style="width: 100%; height: auto; max-height: 250px; object-fit: cover; border-radius: 10px;" />
+                  </div>
+                  <div class="remede-content" style="padding: 10px;">
+                    <h3 style="margin-bottom: 10px; color: #3811c5;">{{ remede.nom }}</h2>
+                    <p style="margin-bottom: 10px; font-size: 1.1em;">
+                      <strong>Description :</strong> {{ remede.description or 'Non spécifiée' }}<br>
+                      <strong>Indications :</strong> {{ remede.indications or 'Non spécifiées' }}<br>
+                      <strong>Dosage :</strong> {{ remede.dosage or 'Non spécifié' }}
+                    </p>
+                    
+                    {% if remede.articles %}
+                    <div class="articles-section" style="margin-bottom: 10px;">
+                      <h4 style="color: #4c5eaf;">Articles scientifiques associés :</h4>
+                      <ul>
+                        {% for article in remede.articles %}
+                        <li>
+                          <a href="{{ article.lien }}" target="_blank" style="color: #007BFF;">{{ article.titre }}</a>
+                          <button onclick="window.open('{{ article.pdf_link }}', '_blank')" style="background-color: #FF5733; color: white; border: none; padding: 5px 10px;">Télécharger PDF</button>
+                        </li>
+                        {% endfor %}
+                      </ul>
+                    </div>
+                    {% endif %}
+                    
+                    {% if remede.liens %}
+                    <a href="{{ remede.liens }}" target="_blank" rel="noopener noreferrer" style="color: #007BFF;">En savoir plus</a>
+                    {% endif %}
+                    
+                    <!-- Boutons d'interaction -->
+                    <div class="interaction-buttons" style="margin-top: 10px; display: flex; gap: 10px;">
+                      <button class="like-btn" style="background-color: #f0efea; color: black; border: none; padding: 5px 10px;">❤️</button>
+                      <button class="share-btn" style="background-color: #fefeff; color: white; border: none; padding: 5px 10px;">🔗</button>
+                      <button class="views-btn" style="background-color: #888; color: white; border: none; padding: 5px 10px;">👁️ 123</button>
+                    </div>
+                  </div>
+                </div>
+                {% endfor %}
               </div>
-          </div>
+            </div>
         </div>
-        
-
-        
+          
+    </main>
+          
+    
     {% include 'includes/footer.html' %}
 
     {% include 'includes/scripts.html' %}

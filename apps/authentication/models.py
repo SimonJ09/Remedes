@@ -61,6 +61,7 @@ class Remede(db.Model):
     posologie = db.Column(db.Text)
     precautions = db.Column(db.Text)
     video = db.Column(db.String(255))  # Chemin ou URL de la vidéo
+    pdf = db.Column(db.String(255))
     images = db.Column(db.String(255))  # Chemin ou URL de l'image
     liens = db.Column(db.String(255))  # Lien utile (ex: article ou source)
     date_ajout = db.Column(db.Date, default=db.func.current_date())
@@ -88,8 +89,6 @@ class Remede(db.Model):
     @property
     def nombre_partages(self):
         return self.partages.count()
-
-
 
 
 class Like(db.Model):

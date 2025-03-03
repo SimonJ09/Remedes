@@ -1,9 +1,6 @@
 # -*- encoding: utf-8 -*-
-from apps.home import blueprint
 from apps.admin import blueprint
 from flask import Flask
-from flask import Flask
-
 from flask import render_template, request
 from flask_login import login_required
 from jinja2 import TemplateNotFound
@@ -36,10 +33,7 @@ def index():
     return render_template('admin/index.html', segment='index')
 
 #----------------------------------------------------------------
-
-
 # ------------------------------Comments-----------------------------
-
 @blueprint.route('/comment', methods=['GET','POST'])
 @login_required
 def comment():
@@ -49,8 +43,6 @@ def comment():
        return render_template('home/page-500.html'), 500 
     return render_template('admin/commentaires.html', segment='index', comments  = comments , users = users )
 
-
-
 @blueprint.route('/map', methods=['GET','POST'])
 @login_required
 def map():
@@ -58,11 +50,6 @@ def map():
     if not current_user.is_admin:
        return render_template('home/page-500.html'), 500 
     return render_template('admin/map.html', segment='index', users = users )
-
-
-
-
-
 
 @blueprint.route('/add_comment', methods=['GET', 'POST'])
 @login_required
@@ -76,7 +63,6 @@ def add_comment():
             nom_fon=form.nom_fon.data,
             proprietes=form.proprietes.data
         )
-
         # Gestion de l'image (si une image est envoyée)
         if form.images.data:
             image_file = request.files.get('images')
@@ -84,38 +70,30 @@ def add_comment():
                 filename = save_file(image_file, subfolder="maladies")
                 maladie.images = filename  # Mise à jour de l'image
                 new_maladie.images = filename 
-
         # Sauvegarde de la nouvelle maladie dans la base de données
         db.session.add(new_maladie)
         db.session.commit()
-
         flash("Nouvelle maladie ajoutée avec succès!", "success")
         return redirect(url_for('admin_blueprint.maladie'))  # Rediriger vers une page après l'ajout
-
     return render_template('admin/ajout_maladie.html', form=form)
-
 
 @blueprint.route('/edit_comment/<int:id>', methods=['GET', 'POST'])
 @login_required
 def edit_comment(id):
     # Récupérer la maladie à partir de l'ID
     maladie = Maladie.query.get_or_404(id)
-
     # Initialiser le formulaire avec les données existantes
     form = MaladieForm(obj=maladie)
-
     if form.validate_on_submit():
         # Enregistrer l'image uploadée si elle existe
         image_file = request.files.get('images')
         if image_file:
             filename = save_file(image_file, subfolder="maladies")
             maladie.images = filename  # Mise à jour de l'image
-
         # Mettre à jour les autres champs
         maladie.nom_commun = form.nom_commun.data
         maladie.nom_fon = form.nom_fon.data
         maladie.proprietes = form.proprietes.data
-
         try:
             # Commit les modifications à la base de données
             db.session.commit()
@@ -143,10 +121,8 @@ def delete_comment(id):
     except Exception as e:
         db.session.rollback()
         flash(f"Une erreur s'est produite lors de la suppression : {str(e)}", "danger")
-
     # Rediriger vers une page appropriée (par exemple, la liste des maladies)
     return redirect(url_for('admin_blueprint.dashboard_maladies'))
-
 
 @blueprint.route('/delete_selected_comment', methods=['POST'])
 @login_required
@@ -155,12 +131,10 @@ def delete_selected_comment():
     if not current_user.is_admin:
         flash("Accès non autorisé.", "danger")
         return redirect(url_for('admin_blueprint.dashboard_maux'))
-
     # Récupérer les ID des maux à supprimer (envoyés via la requête JSON)
     ids = request.json.get('ids', [])
     if not ids:
         return jsonify({'success': False, 'message': "Aucun ID spécifié."}), 400
-
     try:
         # Récupérer les objets Maladie à partir des IDs
         maux_to_delete = Maladie.query.filter(Maladie.id.in_(ids)).all()
@@ -177,15 +151,8 @@ def delete_selected_comment():
 #--------------------------------------------------------------------
 #--------------------------------------------------------------------
 
-
-
-
-
-
-
 # ------------------------------user-----------------------------
 #----------------------------------------------------------------
-
 @blueprint.route('/user', methods=['GET','POST'])
 @login_required
 def user():
@@ -193,8 +160,6 @@ def user():
     if not current_user.is_admin:
        return render_template('home/page-500.html'), 500 
     return render_template('admin/user-admin.html', users=users)
-
-
 
 @blueprint.route('/toggle', methods=['POST'])
 @login_required
@@ -204,7 +169,6 @@ def toggle_switch():
     toggle_id = data.get('id')
     if not toggle_id:
         return jsonify({'success': False, 'message': "ID utilisateur manquant."}), 400
-
     user = Users.query.filter_by(id=toggle_id).first()
     if not user:
         return jsonify({'success': False, 'message': "Utilisateur introuvable."}), 404
@@ -212,7 +176,6 @@ def toggle_switch():
     status = data.get('status')  # True ou False
     if status is None:
         return jsonify({'success': False, 'message': "État manquant."}), 400
-
     # Appliquer une logique en fonction de l'état du toggle
     try:
         user.is_admin = bool(status)
@@ -231,11 +194,9 @@ def activate_selected_users():
     if not current_user.is_admin:
         flash("Accès non autorisé.", "danger")
         return redirect(url_for('admin_blueprint.dashboard_users'))
-
     ids = request.json.get('ids', [])
     if not ids:
         return jsonify({'success': False, 'message': "Aucun ID spécifié."}), 400
-
     try:
         users_to_activate = Users.query.filter(Users.id.in_(ids)).all()
         for user in users_to_activate:
@@ -254,11 +215,9 @@ def deactivate_selected_users():
     if not current_user.is_admin:
         flash("Accès non autorisé.", "danger")
         return redirect(url_for('admin_blueprint.dashboard_users'))
-
     ids = request.json.get('ids', [])
     if not ids:
         return jsonify({'success': False, 'message': "Aucun ID spécifié."}), 400
-
     try:
         users_to_deactivate = Users.query.filter(Users.id.in_(ids)).all()
         for user in users_to_deactivate:
@@ -270,7 +229,6 @@ def deactivate_selected_users():
         return jsonify({'success': False, 'message': f"Erreur : {str(e)}"}), 500
 
 
-
 @blueprint.route('/delete_user/<int:id>', methods=['GET'])
 @login_required
 def delete_user(id):
@@ -278,7 +236,6 @@ def delete_user(id):
     if not current_user.is_admin:
         flash("Accès non autorisé.", "danger")
         return redirect(url_for('admin_blueprint.user'))
-
     # Récupérer l'utilisateur à supprimer
     user = Users.query.get_or_404(id)
     try:
@@ -292,7 +249,6 @@ def delete_user(id):
     except Exception as e:
         db.session.rollback()
         flash(f"Une erreur s'est produite : {str(e)}", "danger")
-
     return redirect(url_for('admin_blueprint.user'))
 #----------------------------------------------------------------
 
@@ -324,7 +280,6 @@ def add_maladie():
             nom_fon=form.nom_fon.data,
             proprietes=form.proprietes.data
         )
-
         # Gestion de l'image (si une image est envoyée)
         if form.images.data:
             image_file = request.files.get('images')
@@ -332,11 +287,9 @@ def add_maladie():
                 filename = save_file(image_file, subfolder="maladies")
                 maladie.images = filename  # Mise à jour de l'image
                 new_maladie.images = filename 
-
         # Sauvegarde de la nouvelle maladie dans la base de données
         db.session.add(new_maladie)
         db.session.commit()
-
         flash("Nouvelle maladie ajoutée avec succès!", "success")
         return redirect(url_for('admin_blueprint.maladie'))  # Rediriger vers une page après l'ajout
 
@@ -348,22 +301,18 @@ def add_maladie():
 def edit_maladie(id):
     # Récupérer la maladie à partir de l'ID
     maladie = Maladie.query.get_or_404(id)
-
     # Initialiser le formulaire avec les données existantes
     form = MaladieForm(obj=maladie)
-
     if form.validate_on_submit():
         # Enregistrer l'image uploadée si elle existe
         image_file = request.files.get('images')
         if image_file:
             filename = save_file(image_file, subfolder="maladies")
             maladie.images = filename  # Mise à jour de l'image
-
         # Mettre à jour les autres champs
         maladie.nom_commun = form.nom_commun.data
         maladie.nom_fon = form.nom_fon.data
         maladie.proprietes = form.proprietes.data
-
         try:
             # Commit les modifications à la base de données
             db.session.commit()
@@ -373,7 +322,6 @@ def edit_maladie(id):
             db.session.rollback()
             msg = f"Une erreur s'est produite : {str(e)}"
             return render_template('admin/ajout_maladie.html', msg=msg, form=form)
-
     # Si le formulaire n'est pas soumis ou qu'il y a une erreur, retourner le formulaire avec les données préremplies
     return render_template('admin/ajout_maladie.html', form=form)
 
@@ -408,7 +356,6 @@ def delete_selected_maux():
     ids = request.json.get('ids', [])
     if not ids:
         return jsonify({'success': False, 'message': "Aucun ID spécifié."}), 400
-
     try:
         # Récupérer les objets Maladie à partir des IDs
         maux_to_delete = Maladie.query.filter(Maladie.id.in_(ids)).all()
